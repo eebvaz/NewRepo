@@ -142,13 +142,13 @@ class Productos
 
     public string ObtenerDatos()
     {
-        return "| Codigo: " + codigo + Environment.NewLine
-            + "| Nombre: " + nombre + Environment.NewLine
-            + "| Fecha: " + fecha.ToShortDateString() + Environment.NewLine
-            + "| Precio: " + precio + Environment.NewLine
-            + "| Cantidad: " + cantidad + Environment.NewLine
-            + "| Vendidos: " + vendidos + Environment.NewLine
-            + "| Estado: " + EstadoProducto() + Environment.NewLine;
+        return "| Codigo: " + codigo + 
+             "| Nombre: " + nombre +
+             "| Fecha: " + fecha.ToShortDateString() + 
+             "| Precio: " + precio + 
+             "| Cantidad: " + cantidad + 
+             "| Vendidos: " + vendidos +
+             "| Estado: " + EstadoProducto();
     }
 
     public void GuardarArchivo(string ruta)
@@ -417,7 +417,7 @@ class Programa
                     }
 
 
-
+                    Console.ReadKey();
                     break;
                     case 5:
                     Console.WriteLine("");
