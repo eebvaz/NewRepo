@@ -139,21 +139,27 @@ class Productos
         }
     }
 
+  
+
+    public string MostrarDatos()
+    {
+        return "| Codigo: " + Codigo + 
+             " | Nombre: " + Nombre +
+             " | Fecha: " + Fecha.ToShortDateString() + 
+             " | Precio: " + Precio + 
+             " | Cantidad: " + Cantidad + 
+             " | Vendidos: " + Vendidos +
+             " | Estado: " + EstadoProducto();
+    }
 
     public string ObtenerDatos()
     {
-        return "| Codigo: " + codigo + 
-             "| Nombre: " + nombre +
-             "| Fecha: " + fecha.ToShortDateString() + 
-             "| Precio: " + precio + 
-             "| Cantidad: " + cantidad + 
-             "| Vendidos: " + vendidos +
-             "| Estado: " + EstadoProducto();
-    }
-
-    public void GuardarArchivo(string ruta)
-    {
-        File.AppendAllText(ruta, ObtenerDatos()+Environment.NewLine);
+        return codigo + " | " +
+               nombre + " | " +
+               fecha.ToShortDateString() + " | " +
+               precio + " | " +
+               cantidad + " | " +
+               vendidos;
     }
 
 }
@@ -165,14 +171,59 @@ class Productos
 
 class Programa
 {
+    //---------------------------//
+    static void GuardarInventario(Dictionary<int, Productos> products,string ruta)
+    {
+        StreamWriter escribir = new StreamWriter(ruta);
+
+        foreach (var item in products)
+        {
+            escribir.WriteLine(item.Value.ObtenerDatos());
+        }
+
+        escribir.Close();
+    }
+    //---------------------------//
+
+    static void CargarInventario(Dictionary<int, Productos> products,string ruta)
+    {
+       
+        if (File.Exists(ruta))
+        {
+      
+            string[] lineas = File.ReadAllLines(ruta);
+
+           
+            foreach (string linea in lineas)
+            {
+           
+                string[] datos = linea.Split('|');
+
+               
+                int codigo = int.Parse(datos[0].Trim());
+                string nombre = datos[1].Trim();
+                DateTime fecha = DateTime.Parse(datos[2].Trim());
+                double precio = double.Parse(datos[3].Trim());
+                int cantidad = int.Parse(datos[4].Trim());
+                int vendidos = int.Parse(datos[5].Trim());
+
+                Productos producto = new Productos(codigo,nombre,fecha, precio,cantidad,vendidos);
+
+                products[codigo] = producto;
+            }
+        }
+    }
+
+    ////////////////////////////////////////////////
+
     static void Main()
     { 
 
       
-       Dictionary <int, Productos> products = new Dictionary<int, Productos> ();
-
+       Dictionary <int, Productos> producto = new Dictionary<int, Productos> ();
 
         string ruta = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments),"Registro.txt");
+        CargarInventario(producto, ruta);
 
         int codigo, cantidad,opcion,vender,CodigoDeBarras, vendidos=0;
         string nombre;
@@ -197,9 +248,9 @@ class Programa
                 Console.WriteLine("Error");
             }
 
-         switch(opcion)
+            switch (opcion)
             {
-                    case 1:
+                case 1:
                     Console.Clear();
                     Console.WriteLine("------------Vender Producto-----------");
                     double PrecioTotal = 0;
@@ -219,7 +270,7 @@ class Programa
                         } while (!validacion);
 
 
-                        if (products.ContainsKey(CodigoDeBarras))
+                        if (producto.ContainsKey(CodigoDeBarras))
                         {
 
                             do
@@ -233,19 +284,20 @@ class Programa
                                 }
                             } while (!validacion);
 
-                            if (vender > products[CodigoDeBarras].Cantidad)
+                            if (vender > producto[CodigoDeBarras].Cantidad)
                             {
                                 Console.WriteLine("No hay existencias");
                             }
                             else
                             {
-                                products[CodigoDeBarras].Cantidad -= vender;
-                                products[CodigoDeBarras].Vendidos += vender;
+                                producto[CodigoDeBarras].Cantidad -= vender;
+                                producto[CodigoDeBarras].Vendidos += vender;
 
-                                double general = vender * products[CodigoDeBarras].Precio;
+                                double general = vender * producto[CodigoDeBarras].Precio;
 
                                 PrecioTotal += general;
 
+                                GuardarInventario(producto, ruta);
                                 Console.WriteLine("Venta realizada");
                                 Console.WriteLine("Total: Q" + general);
                             }
@@ -266,7 +318,7 @@ class Programa
                             if (!validacion)
                             {
                                 Console.WriteLine("opcion invalida");
-                                validacion= false;
+                                validacion = false;
                             }
 
 
@@ -276,13 +328,15 @@ class Programa
                     } while (opc == 1);
                     Console.ReadKey();
 
-                   
+
 
 
                     ///////////////////////////////////////
                     break;
-                    case 2:
+                case 2:
                     Console.Clear();
+
+                    //crear un objeto para validacion en el set//
 
                     do
                     {
@@ -300,7 +354,7 @@ class Programa
                         } while (!validacion);
 
 
-                        if (products.ContainsKey(codigo))
+                        if (producto.ContainsKey(codigo))
                         {
                             Console.WriteLine("Producto ya existente");
                         }
@@ -316,7 +370,7 @@ class Programa
                             //---------------------------------------------//
                             do
                             {
-                                Console.Write("Ingrese fecha nacimiento: ");
+                                Console.Write("Ingrese fecha vencimiento: ");
                                 validacion = DateTime.TryParse(Console.ReadLine(), out fecha);
 
                                 if (!validacion)
@@ -352,21 +406,13 @@ class Programa
 
                             //---------------------------------------------//
 
-                            do
-                            {
-                                Console.Write("Ingrese el codigo de producto: ");
-                                validacion = int.TryParse(Console.ReadLine(), out codigo);
 
-                                if (!validacion)
-                                {
-                                    Console.WriteLine("codigo invalido");
-                                }
-                            } while (!validacion);
 
                             Productos almacenar = new Productos(codigo, nombre, fecha, precio, cantidad, vendidos);
 
-                            products.Add(codigo, almacenar);
-                            almacenar.GuardarArchivo(ruta);
+                            producto.Add(codigo, almacenar);
+                            GuardarInventario(producto, ruta);
+
 
                             Console.WriteLine("Productos añadidos");
                         }
@@ -394,26 +440,96 @@ class Programa
 
                     ///////////////////////////////////////
                     break;
-                    case 3:
+                case 3:
+                    Console.Clear();
                     Console.WriteLine("");
+                    Console.Write("Ingrese el codigo del producto: ");
+                    while(!int.TryParse(Console.ReadLine(),out CodigoDeBarras))
+                    {
+                        Console.WriteLine("Error de dato");
+                    }
+
+                    if(producto.ContainsKey(CodigoDeBarras))
+                    {
+                        Console.WriteLine(producto[CodigoDeBarras]);
+
+
+                        do
+                        {
+                            Console.WriteLine("¿Que desea realizar?");
+                            Console.WriteLine("Opcion 1: Borrar");
+                            Console.WriteLine("Opcion 2: Editar");
+                            Console.WriteLine("Opcion 3: Regresar al menu");
+                            while (!int.TryParse(Console.ReadLine(), out opcion))
+                            {
+                                Console.WriteLine("Error de dato");
+                            }
+
+                            switch (opcion)
+                            {
+                                case 1:
+                                    Console.WriteLine("");
+                                    producto.Remove(CodigoDeBarras);
+                                    Console.WriteLine("Se ha eliminado");
+                                    GuardarInventario(producto, ruta);
+
+                                    break;
+                                case 2:
+
+                                    
+
+                                    break;
+                                default:
+                                    break;
+                            }
+
+                        }while(opcion != 3);
+
+                    }
+                    else
+                    {
+                        Console.WriteLine("Producto no encontrados");
+                    }
+                    Console.ReadKey();
+
 
 
                     ///////////////////////////////////////
                     break;
                     case 4:
+                    Console.Clear();
                     Console.WriteLine("Mostrar");
 
                     Console.WriteLine("Inventario");
-                    if(products.Count == 0)
+                    if(producto.Count == 0)
                     {
                         Console.WriteLine("No hay productos");
                     }
                     else
+
                     {
-                        foreach(var item in products)
+                        Productos popular = null;
+
+                        foreach(var item in producto)
                         {
-                            Console.WriteLine(item.Value.ObtenerDatos()+" Valor total: Q"+item.Value.Total());
+                            Console.WriteLine(item.Value.MostrarDatos()+"| Valor total: Q"+item.Value.Total() + " |");
+                           
+                            if (popular == null || item.Value.Vendidos > popular.Vendidos)
+                            {
+                                popular = item.Value;
+                            }
                         }
+
+                    
+
+                        if(popular != null)
+                        {
+                            Console.WriteLine("");
+                            Console.WriteLine("Producto mas vendido");
+                            Console.WriteLine("Articulo "+ popular.Nombre);
+                            Console.WriteLine("Cantidad mas vendidad: "+ popular.Vendidos);
+                        }
+
                     }
 
 
