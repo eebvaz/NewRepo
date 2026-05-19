@@ -239,9 +239,8 @@ class Programa
             Console.WriteLine("Opcion 2: Agregar Producto");
             Console.WriteLine("Opcion 3: Buscar Producto");
             Console.WriteLine("Opcion 4: Mostrar Inventario");
-            Console.WriteLine("Opcion 5: Verificar Vencimiento");
-            Console.WriteLine("Opcion 6: Gestionar Cliente");
-            Console.WriteLine("Opcion 7: Cerrar");
+            Console.WriteLine("Opcion 5: Gestionar Cliente");
+            Console.WriteLine("Opcion 6: Cerrar");
 
             while (!int.TryParse(Console.ReadLine(), out opcion))
             {
@@ -475,10 +474,89 @@ class Programa
 
                                     break;
                                 case 2:
+                                    Console.Clear();
 
-                                    
+                                    Console.WriteLine("");
+
+                                    Console.WriteLine(producto[CodigoDeBarras].MostrarDatos());
+
+                                    //-----------------------------------//
+                                    Console.Write("Nuevo Nombre: ");
+                                    nombre = Console.ReadLine();
+
+                                    nombre = nombre.Substring(0, 1).ToUpper() + nombre.Substring(1).ToLower();
+
+                                    producto[CodigoDeBarras].Nombre = nombre;
+
+                                    //-----------------------------------//
+                                    do
+                                    {
+                                        Console.Write("Nueva Fecha: ");
+
+                                        validacion = DateTime.TryParse(
+                                            Console.ReadLine(),
+                                            out fecha
+                                        );
+
+                                        if (!validacion)
+                                        {
+                                            Console.WriteLine("Fecha invalida");
+                                        }
+
+                                    } while (!validacion);
+
+                                    producto[CodigoDeBarras].Fecha = fecha;
+
+                                    //-----------------------------------//
+                                    do
+                                    {
+                                        Console.Write("Nuevo Precio: ");
+
+                                        validacion = double.TryParse(
+                                            Console.ReadLine(),
+                                            out precio
+                                        );
+
+                                        if (!validacion)
+                                        {
+                                            Console.WriteLine("Precio invalido");
+                                        }
+
+                                    } while (!validacion);
+
+                                    producto[CodigoDeBarras].Precio = precio;
+
+                                    //-----------------------------------//
+                                    do
+                                    {
+                                        Console.Write("Nueva cantidad: ");
+
+                                        validacion = int.TryParse(
+                                            Console.ReadLine(),
+                                            out cantidad
+                                        );
+
+                                        if (!validacion || cantidad < 0)
+                                        {
+                                            Console.WriteLine("Cantidad invalida");
+                                            validacion = false;
+                                        }
+
+                                    } while (!validacion);
+
+                                    producto[CodigoDeBarras].Cantidad = cantidad;
+
+                                    //-----------------------------------//
+
+                                  
+                                    GuardarInventario(producto, ruta);
+
+                                    Console.WriteLine("Producto editado correctamente");
+
+                                    Console.ReadKey();
 
                                     break;
+
                                 default:
                                     break;
                             }
@@ -538,12 +616,6 @@ class Programa
                     case 5:
                     Console.WriteLine("");
 
-
-                    break;
-                    case 6:
-                    Console.WriteLine("");
-
-
                     break;
                     default:
                     Console.WriteLine("Saliendo...");
@@ -552,7 +624,7 @@ class Programa
             }
 
 
-        }while (opcion !=7);
+        }while (opcion !=6);
 
     }
 }
