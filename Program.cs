@@ -1,50 +1,50 @@
-﻿
+﻿using System;
+using System.Collections.Generic;
+using System.Data.SQLite;
 
-
-class Cliente
+class Persona
 {
-    private string estado; 
-    private double valor;
-    private string encargo;
+    private string nombrePersonal;
+    private string telefono;
 
-    public Cliente(string estado, double valor, string encargo)
+    public Persona(string nombrePersonal, string telefono)
     {
-        this.estado = estado;
-        this.valor = valor;
-        this.encargo = encargo;
+        this.nombrePersonal = nombrePersonal;
+        this.telefono = telefono;
     }
 
-    public string Estado
+    public string NombrePersonal
     {
-        get { return estado; }
-        set { estado = value; }
+        get { return this.nombrePersonal; }
+        set { this.nombrePersonal = value; }
     }
-    public double Valor
+
+    public string Telefono
     {
-        get { return valor; }
-        set { valor = value; }
-    }
-    public string Encargo
-    {
-        get { return encargo; }
-        set { encargo = value; }
+        get { return telefono; }
+        set
+        {
+            if (value.Length == 8)
+            {
+                telefono = value;
+            }
+        }
     }
 }
 
 //////////////////////////////////////////////////
 
-class Persona : Cliente
+class Cliente : Persona
 {
     private string comprador;
-    private string telefono;
+    private string tipo;
+    private double deuda;
+    private int visitas;
 
-
-    public Persona (string estado, double valor, string encargo,string comprador, string telefono): 
-        base (estado, valor, encargo)
+    public Cliente(string nombrePersonal, string telefono, string comprador, string tipo)
+       : base(nombrePersonal, telefono)
     {
         this.comprador = comprador;
-        this.telefono = telefono;
-
     }
 
     public string Comprador
@@ -52,16 +52,61 @@ class Persona : Cliente
         get { return comprador; }
         set { comprador = value; }
     }
-    public string Telefono
+
+    public string Tipo
     {
-        get { return telefono; }
-        set { telefono = value; }
+        get { return tipo; }
+        set { tipo = value; }
     }
 
+    public double Deuda
+    {
+        get { return deuda; }
+        set { deuda = value; }
+    }
 
+    public int Visitas
+    {
+        get { return visitas; }
+        set
+        {
+            if (value >= 0)
+            {
+                visitas = value;
+            }
+        }
+    }
 }
 
 //////////////////////////////////////////////////
+
+class Proveedor : Persona
+{
+    private string distribuidor;
+    private string producto;
+
+    public Proveedor(string distribuidor, string producto, string nombrePersonal, string telefono)
+      : base(nombrePersonal, telefono)
+    {
+        this.distribuidor = distribuidor;
+        this.producto = producto;
+    }
+
+    public string Distribuidor
+    {
+        get { return distribuidor; }
+        set { distribuidor = value; }
+    }
+
+    public string Producto
+    {
+        get { return producto; }
+        set { producto = value; }
+    }
+}
+
+//////////////////////////////////////////////////
+
 class Productos
 {
     private int codigo;
@@ -73,46 +118,85 @@ class Productos
 
     public Productos(int codigo, string nombre, DateTime fecha, double precio, int cantidad, int vendidos)
     {
-        this.codigo = codigo;
-        this.nombre = nombre;
-        this.fecha = fecha;
-        this.precio = precio;
-        this.cantidad = cantidad;
-        this.vendidos = vendidos;
+        Codigo = codigo;
+        Nombre = nombre;
+        Fecha = fecha;
+        Precio = precio;
+        Cantidad = cantidad;
+        Vendidos = vendidos;
     }
 
     public int Codigo
     {
         get { return codigo; }
-      set { codigo = value; }
-
+        set
+        {
+            if (value > 0)
+            {
+                codigo = value;
+            }
+        }
     }
+
     public string Nombre
     {
         get { return nombre; }
-        set { nombre = value; }
+        set
+        {
+            if ((value != null && value.Trim() != ""))
+            {
+                nombre = value;
+            }
+        }
     }
+
     public DateTime Fecha
     {
         get { return fecha; }
-        set { fecha = value; }
-    }
-    public double Precio
-    {
-        get{ return precio; }
-        set { precio = value; }
-    }
-    public int Cantidad
-    {
-        get{ return cantidad; }
-        set { cantidad = value; }
-    }
-    public int Vendidos
-    {
-         get { return vendidos; }
-        set { vendidos = value; }
+        set
+        {
+            if (value >= DateTime.Now.Date)
+            {
+                fecha = value;
+            }
+        }
     }
 
+    public double Precio
+    {
+        get { return precio; }
+        set
+        {
+            if (value > 0)
+            {
+                precio = value;
+            }
+        }
+    }
+
+    public int Cantidad
+    {
+        get { return cantidad; }
+        set
+        {
+            if (value >= 0)
+            {
+                cantidad = value;
+            }
+        }
+    }
+
+    public int Vendidos
+    {
+        get { return vendidos; }
+        set
+        {
+            if (value >= 0)
+            {
+                vendidos = value;
+            }
+        }
+    }
 
     public double Total()
     {
@@ -121,95 +205,164 @@ class Productos
 
     public string EstadoProducto()
     {
-        if(cantidad <= 0)
+        if (cantidad <= 0)
         {
-            return "No disponible";
+            return "No disponible ";
         }
-        else if(fecha < DateTime.Now)
+        else if (fecha < DateTime.Now)
         {
             return "Vencido";
         }
-        else if((fecha - DateTime.Now).Days <= 0)
+        else if ((fecha - DateTime.Now).Days <= 0)
         {
             return "Por vencer";
-        }    
+        }
         else
         {
-            return "Disponible";
+            return "Disponible ";
         }
     }
-
-  
 
     public string MostrarDatos()
     {
-        return "| Codigo: " + Codigo + 
-             " | Nombre: " + Nombre +
-             " | Fecha: " + Fecha.ToShortDateString() + 
-             " | Precio: " + Precio + 
-             " | Cantidad: " + Cantidad + 
-             " | Vendidos: " + Vendidos +
-             " | Estado: " + EstadoProducto();
+        return "| Codigo: " + Codigo +
+              " | Nombre: " + Nombre +
+              " | Fecha: " + Fecha.ToShortDateString() +
+              " | Precio: " + Precio +
+              " | Cantidad: " + Cantidad +
+              " | Vendidos: " + Vendidos +
+              " | Estado: " + EstadoProducto();
     }
-
-    public string ObtenerDatos()
-    {
-        return codigo + " | " +
-               nombre + " | " +
-               fecha.ToShortDateString() + " | " +
-               precio + " | " +
-               cantidad + " | " +
-               vendidos;
-    }
-
 }
-
 
 //////////////////////////////////////////////////
 
-
-
 class Programa
 {
-    //---------------------------//
-    static void GuardarInventario(Dictionary<int, Productos> products,string ruta)
-    {
-        StreamWriter escribir = new StreamWriter(ruta);
 
-        foreach (var item in products)
+    private static string conexion = "Data Source=inventario.db";
+
+    static void CrearTabla()
+    {
+        using (SQLiteConnection db = new SQLiteConnection(conexion))
         {
-            escribir.WriteLine(item.Value.ObtenerDatos());
+            db.Open();
+
+            string sql = @" CREATE TABLE IF NOT EXISTS productos(
+
+                codigo  INTEGER PRIMARY KEY,
+                nombre  TEXT    NOT NULL,
+                fecha   TEXT    NOT NULL,
+                precio  REAL    NOT NULL,
+                cantidad INTEGER NOT NULL,
+                vendidos INTEGER NOT NULL
+
+            );";
+
+            SQLiteCommand comando = new SQLiteCommand(sql, db);
+
+            comando.ExecuteNonQuery();
+
+            Console.WriteLine("Base de datos y tabla listas");
         }
-
-        escribir.Close();
     }
-    //---------------------------//
 
-    static void CargarInventario(Dictionary<int, Productos> products,string ruta)
+
+    static void InsertarProducto(Productos p)
     {
-       
-        if (File.Exists(ruta))
+        using (SQLiteConnection db = new SQLiteConnection(conexion))
         {
-      
-            string[] lineas = File.ReadAllLines(ruta);
+            db.Open();
 
-           
-            foreach (string linea in lineas)
+            string sql =  "INSERT INTO productos" +
+                "(codigo, nombre, fecha, precio, cantidad, vendidos) " +
+                "VALUES(@codigo, @nombre, @fecha, @precio, @cantidad, @vendidos)";
+
+            SQLiteCommand comando = new SQLiteCommand(sql, db);
+            comando.Parameters.AddWithValue("@codigo", p.Codigo);
+            comando.Parameters.AddWithValue("@nombre", p.Nombre);
+            comando.Parameters.AddWithValue("@fecha", p.Fecha.ToString());
+            comando.Parameters.AddWithValue("@precio", p.Precio);
+            comando.Parameters.AddWithValue("@cantidad", p.Cantidad);
+            comando.Parameters.AddWithValue("@vendidos", p.Vendidos);
+
+            comando.ExecuteNonQuery();
+            Console.WriteLine("Producto agregado");
+        }
+    }
+
+    static void ModificarProducto(Productos p)
+    {
+        using (SQLiteConnection db = new SQLiteConnection(conexion))
+        {
+            db.Open();
+
+            string sql =
+                "UPDATE productos SET " +
+                "nombre=@nombre, fecha=@fecha, " +
+                "precio=@precio, cantidad=@cantidad, " +
+                "vendidos=@vendidos " +
+                "WHERE codigo=@codigo";
+
+            SQLiteCommand comando = new SQLiteCommand(sql, db);
+            comando.Parameters.AddWithValue("@codigo", p.Codigo);
+            comando.Parameters.AddWithValue("@nombre", p.Nombre);
+            comando.Parameters.AddWithValue("@fecha", p.Fecha.ToString());
+            comando.Parameters.AddWithValue("@precio", p.Precio);
+            comando.Parameters.AddWithValue("@cantidad", p.Cantidad);
+            comando.Parameters.AddWithValue("@vendidos", p.Vendidos);
+
+            int filas = comando.ExecuteNonQuery();
+
+            if (filas > 0)
+                Console.WriteLine("Inventario modificado");
+            else
+                Console.WriteLine("Codigo no encontrado");
+        }
+    }
+
+    static void EliminarProducto(int codigo)
+    {
+        using (SQLiteConnection db = new SQLiteConnection(conexion))
+        {
+            db.Open();
+
+            string sql = "DELETE FROM productos " + "WHERE codigo=@codigo";
+
+            SQLiteCommand comando =new SQLiteCommand(sql, db);
+
+            comando.Parameters.AddWithValue( "@codigo", codigo);
+            comando.ExecuteNonQuery();
+        }
+    }
+
+
+
+
+    static void CargarInventario(Dictionary<int, Productos> productos)
+    {
+        using (SQLiteConnection db = new SQLiteConnection(conexion))
+        {
+            db.Open();
+
+            string sql = "SELECT * FROM productos";
+
+            SQLiteCommand comando = new SQLiteCommand(sql, db);
+
+            SQLiteDataReader lector = comando.ExecuteReader();
+
+            while (lector.Read())
             {
-           
-                string[] datos = linea.Split('|');
+                int codigo = int.Parse(lector["codigo"].ToString());
+                string nombre = lector["nombre"].ToString();
+                DateTime fecha = DateTime.Parse(lector["fecha"].ToString());
+                double precio = double.Parse(lector["precio"].ToString());
+                int cantidad = int.Parse(lector["cantidad"].ToString());
+                int vendidos = int.Parse(lector["vendidos"].ToString());
 
-               
-                int codigo = int.Parse(datos[0].Trim());
-                string nombre = datos[1].Trim();
-                DateTime fecha = DateTime.Parse(datos[2].Trim());
-                double precio = double.Parse(datos[3].Trim());
-                int cantidad = int.Parse(datos[4].Trim());
-                int vendidos = int.Parse(datos[5].Trim());
+                Productos p = new Productos(codigo, nombre, fecha, precio, cantidad, vendidos);
 
-                Productos producto = new Productos(codigo,nombre,fecha, precio,cantidad,vendidos);
-
-                products[codigo] = producto;
+                productos[codigo] = p;
             }
         }
     }
@@ -217,22 +370,23 @@ class Programa
     ////////////////////////////////////////////////
 
     static void Main()
-    { 
+    {
+   
+        CrearTabla();
 
-      
-       Dictionary <int, Productos> producto = new Dictionary<int, Productos> ();
+        Dictionary<int, Productos> producto = new Dictionary<int, Productos>();
 
-        string ruta = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments),"Registro.txt");
-        CargarInventario(producto, ruta);
+        CargarInventario(producto);
 
-        int codigo, cantidad,opcion,vender,CodigoDeBarras, vendidos=0;
+        int codigo, cantidad, opcion, vender, CodigoDeBarras, vendidos = 0;
         string nombre;
         DateTime fecha;
         double precio;
         bool validacion;
         int opc;
 
-        do {
+        do
+        {
             Console.Clear();
             Console.WriteLine("");
             Console.WriteLine("Opcion 1: Vender Producto");
@@ -249,15 +403,16 @@ class Programa
 
             switch (opcion)
             {
+                ////////////////////////////////////////////////////////////////////
                 case 1:
                     Console.Clear();
                     Console.WriteLine("------------Vender Producto-----------");
                     double PrecioTotal = 0;
                     do
                     {
-
                         do
                         {
+                            //-----------------------------------//
                             Console.Write("Ingrese el codigo: ");
                             validacion = int.TryParse(Console.ReadLine(), out CodigoDeBarras);
                             if (!validacion || CodigoDeBarras <= 0)
@@ -265,16 +420,15 @@ class Programa
                                 Console.WriteLine("Codigo invalido");
                                 validacion = false;
                             }
-
                         } while (!validacion);
-
 
                         if (producto.ContainsKey(CodigoDeBarras))
                         {
-
                             do
                             {
-                                Console.Write("Ingrese la cantidad: ");
+                                //-----------------------------------//
+                                Console.Write("Producto: "+producto[CodigoDeBarras].Nombre);
+                                Console.Write(" Ingrese la cantidad: ");
                                 validacion = int.TryParse(Console.ReadLine(), out vender);
                                 if (!validacion || vender <= 0)
                                 {
@@ -293,10 +447,11 @@ class Programa
                                 producto[CodigoDeBarras].Vendidos += vender;
 
                                 double general = vender * producto[CodigoDeBarras].Precio;
-
                                 PrecioTotal += general;
 
-                                GuardarInventario(producto, ruta);
+
+                                ModificarProducto(producto[CodigoDeBarras]);
+
                                 Console.WriteLine("Venta realizada");
                                 Console.WriteLine("Total: Q" + general);
                             }
@@ -306,7 +461,6 @@ class Programa
                             Console.WriteLine("No hay existencias");
                         }
 
-
                         Console.WriteLine("Desea agregar otro producto");
                         Console.WriteLine("1: Si");
                         Console.WriteLine("2: No");
@@ -319,109 +473,95 @@ class Programa
                                 Console.WriteLine("opcion invalida");
                                 validacion = false;
                             }
-
-
                         } while (!validacion);
-
 
                     } while (opc == 1);
                     Console.ReadKey();
-
-
-
-
-                    ///////////////////////////////////////
                     break;
+
+
+                ////////////////////////////////////////////////////////////////////
                 case 2:
                     Console.Clear();
-
-                    //crear un objeto para validacion en el set//
-
                     do
                     {
                         Console.WriteLine("---------Agregar Producto-------");
 
                         do
                         {
+                            //-----------------------------------//
                             Console.Write("Ingrese el codigo de producto: ");
                             validacion = int.TryParse(Console.ReadLine(), out codigo);
-
                             if (!validacion)
                             {
                                 Console.WriteLine("codigo invalido");
                             }
                         } while (!validacion);
 
-
                         if (producto.ContainsKey(codigo))
                         {
                             Console.WriteLine("Producto ya existente");
                         }
-                        else
-                        {
-                            //---------------------------------------------//
 
+                        else
+                        
+                        {
+                            //-----------------------------------//
                             Console.Write("Ingrese el nombre: ");
                             nombre = Console.ReadLine();
-
                             nombre = nombre.Substring(0, 1).ToUpper() + nombre.Substring(1).ToLower();
 
-                            //---------------------------------------------//
                             do
                             {
+                                //-----------------------------------//
                                 Console.Write("Ingrese fecha vencimiento: ");
                                 validacion = DateTime.TryParse(Console.ReadLine(), out fecha);
-
                                 if (!validacion)
                                 {
                                     Console.WriteLine("Fecha invalida");
                                 }
                             } while (!validacion);
 
-                            //---------------------------------------------//
                             do
                             {
+                                //-----------------------------------//
                                 Console.Write("Ingrese el precio: ");
                                 validacion = double.TryParse(Console.ReadLine(), out precio);
-
                                 if (!validacion)
                                 {
                                     Console.WriteLine("dato invalido");
                                 }
                             } while (!validacion);
 
-                            //---------------------------------------------//
-
                             do
                             {
+                                //-----------------------------------//
                                 Console.Write("Ingrese la cantidad: ");
                                 validacion = int.TryParse(Console.ReadLine(), out cantidad);
-
                                 if (!validacion)
                                 {
                                     Console.WriteLine("codigo invalido");
                                 }
                             } while (!validacion);
 
-                            //---------------------------------------------//
-
-
+                            //-----------------------------------//
 
                             Productos almacenar = new Productos(codigo, nombre, fecha, precio, cantidad, vendidos);
 
                             producto.Add(codigo, almacenar);
-                            GuardarInventario(producto, ruta);
 
+
+                            InsertarProducto(almacenar);
 
                             Console.WriteLine("Productos añadidos");
                         }
 
-                        //--------------------------//
                         Console.WriteLine("Desea agregar otro producto");
                         Console.WriteLine("1: Si");
                         Console.WriteLine("2: No");
                         do
                         {
+                            //-----------------------------------//
                             Console.Write("Opcion: ");
                             validacion = int.TryParse(Console.ReadLine(), out opc);
                             if (!validacion)
@@ -429,32 +569,30 @@ class Programa
                                 Console.WriteLine("opcion invalida");
                                 validacion = false;
                             }
-
-
                         } while (!validacion);
-
 
                     } while (opc == 1);
                     Console.ReadKey();
-
-                    ///////////////////////////////////////
                     break;
+
+
+                ////////////////////////////////////////////////////////////////////
                 case 3:
                     Console.Clear();
                     Console.WriteLine("");
                     Console.Write("Ingrese el codigo del producto: ");
-                    while(!int.TryParse(Console.ReadLine(),out CodigoDeBarras))
+                    while (!int.TryParse(Console.ReadLine(), out CodigoDeBarras))
                     {
                         Console.WriteLine("Error de dato");
                     }
 
-                    if(producto.ContainsKey(CodigoDeBarras))
+                    if (producto.ContainsKey(CodigoDeBarras))
                     {
-                        Console.WriteLine(producto[CodigoDeBarras]);
-
+                        Console.WriteLine(producto[CodigoDeBarras].MostrarDatos());
 
                         do
                         {
+                            Console.WriteLine("");
                             Console.WriteLine("¿Que desea realizar?");
                             Console.WriteLine("Opcion 1: Borrar");
                             Console.WriteLine("Opcion 2: Editar");
@@ -469,162 +607,229 @@ class Programa
                                 case 1:
                                     Console.WriteLine("");
                                     producto.Remove(CodigoDeBarras);
-                                    Console.WriteLine("Se ha eliminado");
-                                    GuardarInventario(producto, ruta);
 
+                                    EliminarProducto(CodigoDeBarras);
+
+                                    Console.WriteLine("Se ha eliminado");
                                     break;
+
+
+
                                 case 2:
                                     Console.Clear();
-
                                     Console.WriteLine("");
 
-                                    Console.WriteLine(producto[CodigoDeBarras].MostrarDatos());
-
-                                    //-----------------------------------//
-                                    Console.Write("Nuevo Nombre: ");
-                                    nombre = Console.ReadLine();
-
-                                    nombre = nombre.Substring(0, 1).ToUpper() + nombre.Substring(1).ToLower();
-
-                                    producto[CodigoDeBarras].Nombre = nombre;
-
-                                    //-----------------------------------//
                                     do
                                     {
-                                        Console.Write("Nueva Fecha: ");
+                                     
+                                        Console.WriteLine(producto[CodigoDeBarras].MostrarDatos());
+                                        Console.WriteLine("");
+                                        Console.WriteLine("Que deseas editar");
+                                        Console.WriteLine("Opcion 1: Nombre");
+                                        Console.WriteLine("Opcion 2: Fecha");
+                                        Console.WriteLine("Opcion 3: Precio");
+                                        Console.WriteLine("Opcion 4: Cantidad");
+                                        Console.WriteLine("Opcion 5: Todos");
+                                        Console.WriteLine("Opcion 6: Regresar al menu");
 
-                                        validacion = DateTime.TryParse(
-                                            Console.ReadLine(),
-                                            out fecha
-                                        );
-
-                                        if (!validacion)
+                                        do
                                         {
-                                            Console.WriteLine("Fecha invalida");
+                                            //-----------------------------------//
+                                            Console.Write("Opcion: ");
+                                            validacion = int.TryParse(Console.ReadLine(), out opc);
+                                            if (!validacion)
+                                            {
+                                                Console.WriteLine("opcion invalida");
+                                                validacion = false;
+                                            }
+                                        } while (!validacion);
+
+                                        switch (opc)
+                                        {
+                                            case 1:
+
+                                                Console.Write("Nuevo nombre: ");
+                                                producto[CodigoDeBarras].Nombre = Console.ReadLine();
+                                                producto[CodigoDeBarras].Nombre = producto[CodigoDeBarras].Nombre.Substring(0, 1).ToUpper()
+                                                    + producto[CodigoDeBarras].Nombre.Substring(1).ToLower();
+
+                                                break;
+                                            case 2:
+
+                                                do
+                                                {
+                                                    //-----------------------------------//
+                                                    Console.Write("Nueva Fecha: ");
+                                                    validacion = DateTime.TryParse(Console.ReadLine(), out fecha);
+                                                    if (!validacion)
+                                                    {
+                                                        Console.WriteLine("Fecha invalida");
+                                                    }
+                                                } while (!validacion);
+                                                producto[CodigoDeBarras].Fecha = fecha;
+
+                                                break;
+                                            case 3:
+                                                do
+                                                {
+                                                    //-----------------------------------//
+                                                    Console.Write("Nuevo Precio: ");
+                                                    validacion = double.TryParse(Console.ReadLine(), out precio);
+                                                    if (!validacion)
+                                                    {
+                                                        Console.WriteLine("Precio invalido");
+                                                    }
+                                                } while (!validacion);
+                                                producto[CodigoDeBarras].Precio = precio;
+
+
+                                                break;
+                                            case 4:
+
+                                                do
+                                                {
+                                                    //-----------------------------------//
+                                                    Console.Write("Nueva cantidad: ");
+                                                    validacion = int.TryParse(Console.ReadLine(), out cantidad);
+                                                    if (!validacion || cantidad < 0)
+                                                    {
+                                                        Console.WriteLine("Cantidad invalida");
+                                                        validacion = false;
+                                                    }
+                                                } while (!validacion);
+                                                producto[CodigoDeBarras].Cantidad = cantidad;
+
+                                                break;
+                                            case 5:
+
+                                                Console.Write("Nuevo nombre: ");
+                                                producto[CodigoDeBarras].Nombre = Console.ReadLine();
+                                                producto[CodigoDeBarras].Nombre = producto[CodigoDeBarras].Nombre.Substring(0, 1).ToUpper()
+                                                    + producto[CodigoDeBarras].Nombre.Substring(1).ToLower();
+
+                                                do
+                                                {
+                                                    //-----------------------------------//
+                                                    Console.Write("Nueva Fecha: ");
+                                                    validacion = DateTime.TryParse(Console.ReadLine(), out fecha);
+                                                    if (!validacion)
+                                                    {
+                                                        Console.WriteLine("Fecha invalida");
+                                                    }
+                                                } while (!validacion);
+                                                producto[CodigoDeBarras].Fecha = fecha;
+
+                                                do
+                                                {
+                                                    //-----------------------------------//
+                                                    Console.Write("Nuevo Precio: ");
+                                                    validacion = double.TryParse(Console.ReadLine(), out precio);
+                                                    if (!validacion)
+                                                    {
+                                                        Console.WriteLine("Precio invalido");
+                                                    }
+                                                } while (!validacion);
+                                                producto[CodigoDeBarras].Precio = precio;
+
+                                                do
+                                                {
+                                                    //-----------------------------------//
+                                                    Console.Write("Nueva cantidad: ");
+                                                    validacion = int.TryParse(Console.ReadLine(), out cantidad);
+                                                    if (!validacion || cantidad < 0)
+                                                    {
+                                                        Console.WriteLine("Cantidad invalida");
+                                                        validacion = false;
+                                                    }
+                                                } while (!validacion);
+                                                producto[CodigoDeBarras].Cantidad = cantidad;
+
+                                                break;
+
+                                            default:
+                                                break;
+
                                         }
 
-                                    } while (!validacion);
 
-                                    producto[CodigoDeBarras].Fecha = fecha;
+                                    } while (opc != 6);
 
-                                    //-----------------------------------//
-                                    do
-                                    {
-                                        Console.Write("Nuevo Precio: ");
 
-                                        validacion = double.TryParse(
-                                            Console.ReadLine(),
-                                            out precio
-                                        );
+                                    ModificarProducto(producto[CodigoDeBarras]);
 
-                                        if (!validacion)
-                                        {
-                                            Console.WriteLine("Precio invalido");
-                                        }
-
-                                    } while (!validacion);
-
-                                    producto[CodigoDeBarras].Precio = precio;
-
-                                    //-----------------------------------//
-                                    do
-                                    {
-                                        Console.Write("Nueva cantidad: ");
-
-                                        validacion = int.TryParse(
-                                            Console.ReadLine(),
-                                            out cantidad
-                                        );
-
-                                        if (!validacion || cantidad < 0)
-                                        {
-                                            Console.WriteLine("Cantidad invalida");
-                                            validacion = false;
-                                        }
-
-                                    } while (!validacion);
-
-                                    producto[CodigoDeBarras].Cantidad = cantidad;
-
-                                    //-----------------------------------//
-
-                                  
-                                    GuardarInventario(producto, ruta);
-
-                                    Console.WriteLine("Producto editado correctamente");
 
                                     Console.ReadKey();
-
                                     break;
 
                                 default:
                                     break;
                             }
 
-                        }while(opcion != 3);
-
+                        } while (opcion != 3);
                     }
                     else
                     {
-                        Console.WriteLine("Producto no encontrados");
+                        Console.WriteLine("Producto no encontrado");
                     }
                     Console.ReadKey();
-
-
-
-                    ///////////////////////////////////////
                     break;
-                    case 4:
-                    Console.Clear();
-                    Console.WriteLine("Mostrar");
 
+
+                    ////////////////////////////////////////////////////////////////////
+                case 4:
+                    Console.Clear();
                     Console.WriteLine("Inventario");
-                    if(producto.Count == 0)
+
+                    if (producto.Count == 0)
                     {
                         Console.WriteLine("No hay productos");
                     }
                     else
-
                     {
                         Productos popular = null;
 
-                        foreach(var item in producto)
+                        foreach (var item in producto)
                         {
-                            Console.WriteLine(item.Value.MostrarDatos()+"| Valor total: Q"+item.Value.Total() + " |");
-                           
+                            Console.WriteLine(
+                                item.Value.MostrarDatos() + "| Valor total: Q" + item.Value.Total() + " |");
+
                             if (popular == null || item.Value.Vendidos > popular.Vendidos)
                             {
                                 popular = item.Value;
                             }
                         }
 
-                    
-
-                        if(popular != null)
+                        if (popular != null)
                         {
                             Console.WriteLine("");
                             Console.WriteLine("Producto mas vendido");
-                            Console.WriteLine("Articulo "+ popular.Nombre);
-                            Console.WriteLine("Cantidad mas vendidad: "+ popular.Vendidos);
+                            Console.WriteLine("Articulo " + popular.Nombre);
+                            Console.WriteLine("Cantidad mas vendida: " + popular.Vendidos);
                         }
-
                     }
-
-
                     Console.ReadKey();
                     break;
-                    case 5:
-                    Console.WriteLine("");
 
+
+                ////////////////////////////////////////////////////////////////////
+                case 5:
+                    Console.WriteLine("Cliente");
+                    Console.Write("Ingrese el nombre: ");
+                    Console.Write("Ingrese el apellido: ");
                     break;
-                    default:
+                ////////////////////////////////////////////////////////////////////
+                case 6:
+                    Console.WriteLine("Proveedor");
+                    Console.Write("Ingrese el nombre: ");
+                    Console.Write("Ingrese el apellido: ");
+                    break;
+
+
+                default:
                     Console.WriteLine("Saliendo...");
                     break;
-
             }
 
-
-        }while (opcion !=6);
-
+        } while (opcion != 6);
     }
 }
