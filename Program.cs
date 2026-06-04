@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Data.SQLite;
 
 class Persona
@@ -36,7 +35,7 @@ class Persona
 
 class Cliente : Persona
 {
-    private string comprador;
+  
     private string tipo;
     private double deuda;
     private int visitas;
@@ -44,14 +43,11 @@ class Cliente : Persona
     public Cliente(string nombrePersonal, string telefono, string comprador, string tipo)
        : base(nombrePersonal, telefono)
     {
-        this.comprador = comprador;
+       this.tipo = tipo;
+       this.visitas = visitas;
+       this.deuda = deuda;
     }
 
-    public string Comprador
-    {
-        get { return comprador; }
-        set { comprador = value; }
-    }
 
     public string Tipo
     {
@@ -228,7 +224,7 @@ class Productos
         return "| Codigo: " + Codigo +
               " | Nombre: " + Nombre +
               " | Fecha: " + Fecha.ToShortDateString() +
-              " | Precio: " + Precio +
+              " | Precio: Q" + Precio +
               " | Cantidad: " + Cantidad +
               " | Vendidos: " + Vendidos +
               " | Estado: " + EstadoProducto();
@@ -256,19 +252,26 @@ class Programa
                 precio  REAL    NOT NULL,
                 cantidad INTEGER NOT NULL,
                 vendidos INTEGER NOT NULL
+            );
 
-            );";
+        
+             
+
+
+
+
+
+
+            ";
 
             SQLiteCommand comando = new SQLiteCommand(sql, db);
 
             comando.ExecuteNonQuery();
-
-            Console.WriteLine("Base de datos y tabla listas");
         }
     }
 
 
-    static void InsertarProducto(Productos p)
+    static void GuardarDatos1(Productos articulo0)
     {
         using (SQLiteConnection db = new SQLiteConnection(conexion))
         {
@@ -279,45 +282,74 @@ class Programa
                 "VALUES(@codigo, @nombre, @fecha, @precio, @cantidad, @vendidos)";
 
             SQLiteCommand comando = new SQLiteCommand(sql, db);
-            comando.Parameters.AddWithValue("@codigo", p.Codigo);
-            comando.Parameters.AddWithValue("@nombre", p.Nombre);
-            comando.Parameters.AddWithValue("@fecha", p.Fecha.ToString());
-            comando.Parameters.AddWithValue("@precio", p.Precio);
-            comando.Parameters.AddWithValue("@cantidad", p.Cantidad);
-            comando.Parameters.AddWithValue("@vendidos", p.Vendidos);
+            comando.Parameters.AddWithValue("@codigo", articulo0.Codigo);
+            comando.Parameters.AddWithValue("@nombre", articulo0.Nombre);
+            comando.Parameters.AddWithValue("@fecha", articulo0.Fecha.ToString());
+            comando.Parameters.AddWithValue("@precio", articulo0.Precio);
+            comando.Parameters.AddWithValue("@cantidad", articulo0.Cantidad);
+            comando.Parameters.AddWithValue("@vendidos", articulo0.Vendidos);
 
             comando.ExecuteNonQuery();
             Console.WriteLine("Producto agregado");
         }
     }
 
-    static void ModificarProducto(Productos p)
+    static void GuardarDatos2(Productos articulo0)
     {
         using (SQLiteConnection db = new SQLiteConnection(conexion))
         {
             db.Open();
 
-            string sql =
-                "UPDATE productos SET " +
+            string sql = "INSERT INTO productos" +
+                "(codigo, nombre, fecha, precio, cantidad, vendidos) " +
+                "VALUES(@codigo, @nombre, @fecha, @precio, @cantidad, @vendidos)";
+
+            SQLiteCommand comando = new SQLiteCommand(sql, db);
+            comando.Parameters.AddWithValue("@codigo", articulo0.Codigo);
+            comando.Parameters.AddWithValue("@nombre", articulo0.Nombre);
+            comando.Parameters.AddWithValue("@fecha", articulo0.Fecha.ToString());
+            comando.Parameters.AddWithValue("@precio", articulo0.Precio);
+
+
+            comando.ExecuteNonQuery();
+            Console.WriteLine("Producto agregado");
+        }
+    }
+
+
+
+    static void ModificarDatos(Productos articulo1)
+    {
+        using (SQLiteConnection db = new SQLiteConnection(conexion))
+        {
+            db.Open();
+
+            string sql ="UPDATE productos SET " +
                 "nombre=@nombre, fecha=@fecha, " +
                 "precio=@precio, cantidad=@cantidad, " +
                 "vendidos=@vendidos " +
                 "WHERE codigo=@codigo";
 
             SQLiteCommand comando = new SQLiteCommand(sql, db);
-            comando.Parameters.AddWithValue("@codigo", p.Codigo);
-            comando.Parameters.AddWithValue("@nombre", p.Nombre);
-            comando.Parameters.AddWithValue("@fecha", p.Fecha.ToString());
-            comando.Parameters.AddWithValue("@precio", p.Precio);
-            comando.Parameters.AddWithValue("@cantidad", p.Cantidad);
-            comando.Parameters.AddWithValue("@vendidos", p.Vendidos);
+            comando.Parameters.AddWithValue("@codigo", articulo1.Codigo);
+            comando.Parameters.AddWithValue("@nombre", articulo1.Nombre);
+            comando.Parameters.AddWithValue("@fecha", articulo1.Fecha.ToString());
+            comando.Parameters.AddWithValue("@precio", articulo1.Precio);
+            comando.Parameters.AddWithValue("@cantidad", articulo1.Cantidad);
+            comando.Parameters.AddWithValue("@vendidos", articulo1.Vendidos);
 
             int filas = comando.ExecuteNonQuery();
 
             if (filas > 0)
+            {
+                Console.WriteLine("");
                 Console.WriteLine("Inventario modificado");
+            }
             else
+            {
+                Console.WriteLine("");
                 Console.WriteLine("Codigo no encontrado");
+            }
         }
     }
 
@@ -360,9 +392,9 @@ class Programa
                 int cantidad = int.Parse(lector["cantidad"].ToString());
                 int vendidos = int.Parse(lector["vendidos"].ToString());
 
-                Productos p = new Productos(codigo, nombre, fecha, precio, cantidad, vendidos);
+                Productos articulo2 = new Productos(codigo, nombre, fecha, precio, cantidad, vendidos);
 
-                productos[codigo] = p;
+                productos[codigo] = articulo2;
             }
         }
     }
@@ -388,13 +420,14 @@ class Programa
         do
         {
             Console.Clear();
-            Console.WriteLine("");
+            Console.WriteLine("--------------Menu----------------");
             Console.WriteLine("Opcion 1: Vender Producto");
             Console.WriteLine("Opcion 2: Agregar Producto");
             Console.WriteLine("Opcion 3: Buscar Producto");
             Console.WriteLine("Opcion 4: Mostrar Inventario");
             Console.WriteLine("Opcion 5: Gestionar Cliente");
-            Console.WriteLine("Opcion 6: Cerrar");
+            Console.WriteLine("Opcion 6: Gestionar Proveedor");
+            Console.WriteLine("Opcion 7: Cerrar");
 
             while (!int.TryParse(Console.ReadLine(), out opcion))
             {
@@ -424,37 +457,49 @@ class Programa
 
                         if (producto.ContainsKey(CodigoDeBarras))
                         {
-                            do
-                            {
-                                //-----------------------------------//
-                                Console.Write("Producto: "+producto[CodigoDeBarras].Nombre);
-                                Console.Write(" Ingrese la cantidad: ");
-                                validacion = int.TryParse(Console.ReadLine(), out vender);
-                                if (!validacion || vender <= 0)
-                                {
-                                    Console.WriteLine("Cantidad invalida");
-                                    validacion = false;
-                                }
-                            } while (!validacion);
 
-                            if (vender > producto[CodigoDeBarras].Cantidad)
+
+                            if (producto[CodigoDeBarras].Cantidad <= 0)
                             {
                                 Console.WriteLine("No hay existencias");
                             }
+
                             else
                             {
-                                producto[CodigoDeBarras].Cantidad -= vender;
-                                producto[CodigoDeBarras].Vendidos += vender;
+                                do
+                                {
 
-                                double general = vender * producto[CodigoDeBarras].Precio;
-                                PrecioTotal += general;
+                                    //-----------------------------------//
+                                    Console.Write("| Producto: " + producto[CodigoDeBarras].Nombre + " | Precio: " + producto[CodigoDeBarras].Precio);
+                                    Console.Write("| Ingrese la cantidad: ");
+                                    validacion = int.TryParse(Console.ReadLine(), out vender);
+                                    if (!validacion || vender <= 0)
+                                    {
+                                        Console.WriteLine("Cantidad invalida");
+                                        validacion = false;
+                                    }
+                                } while (!validacion);
+
+                                if (vender > producto[CodigoDeBarras].Cantidad)
+                                {
+                                    Console.WriteLine("No hay existencias");
+                                }
+                                else
+                                {
+                                    producto[CodigoDeBarras].Cantidad -= vender;
+                                    producto[CodigoDeBarras].Vendidos += vender;
+
+                                    double general = vender * producto[CodigoDeBarras].Precio;
+                                    PrecioTotal += general;
 
 
-                                ModificarProducto(producto[CodigoDeBarras]);
+                                    ModificarDatos(producto[CodigoDeBarras]);
 
-                                Console.WriteLine("Venta realizada");
-                                Console.WriteLine("Total: Q" + general);
+                                    Console.WriteLine("Venta realizada");
+                                    Console.WriteLine("Total: Q" + general);
+                                }
                             }
+                  
                         }
                         else
                         {
@@ -485,7 +530,7 @@ class Programa
                     Console.Clear();
                     do
                     {
-                        Console.WriteLine("---------Agregar Producto-------");
+                        Console.WriteLine("---------Agregar Productos-------");
 
                         do
                         {
@@ -551,7 +596,7 @@ class Programa
                             producto.Add(codigo, almacenar);
 
 
-                            InsertarProducto(almacenar);
+                            GuardarDatos1(almacenar);
 
                             Console.WriteLine("Productos añadidos");
                         }
@@ -579,7 +624,7 @@ class Programa
                 ////////////////////////////////////////////////////////////////////
                 case 3:
                     Console.Clear();
-                    Console.WriteLine("");
+                    Console.WriteLine("-----------------Buscar-----------------");
                     Console.Write("Ingrese el codigo del producto: ");
                     while (!int.TryParse(Console.ReadLine(), out CodigoDeBarras))
                     {
@@ -617,11 +662,11 @@ class Programa
 
                                 case 2:
                                     Console.Clear();
-                                    Console.WriteLine("");
+                                    Console.WriteLine("---------Editar---------");
 
                                     do
                                     {
-                                     
+                                        Console.Clear();
                                         Console.WriteLine(producto[CodigoDeBarras].MostrarDatos());
                                         Console.WriteLine("");
                                         Console.WriteLine("Que deseas editar");
@@ -755,7 +800,7 @@ class Programa
                                     } while (opc != 6);
 
 
-                                    ModificarProducto(producto[CodigoDeBarras]);
+                                    ModificarDatos(producto[CodigoDeBarras]);
 
 
                                     Console.ReadKey();
@@ -790,8 +835,7 @@ class Programa
 
                         foreach (var item in producto)
                         {
-                            Console.WriteLine(
-                                item.Value.MostrarDatos() + "| Valor total: Q" + item.Value.Total() + " |");
+                            Console.WriteLine(item.Value.MostrarDatos() + "| Valor total: Q" + item.Value.Total() + " |");
 
                             if (popular == null || item.Value.Vendidos > popular.Vendidos)
                             {
@@ -802,8 +846,7 @@ class Programa
                         if (popular != null)
                         {
                             Console.WriteLine("");
-                            Console.WriteLine("Producto mas vendido");
-                            Console.WriteLine("Articulo " + popular.Nombre);
+                            Console.WriteLine("Producto mas vendido: " + popular.Nombre);
                             Console.WriteLine("Cantidad mas vendida: " + popular.Vendidos);
                         }
                     }
@@ -814,22 +857,102 @@ class Programa
                 ////////////////////////////////////////////////////////////////////
                 case 5:
                     Console.WriteLine("Cliente");
+
+                   Dictionary <string, Cliente> datos = new Dictionary<string, Cliente>();
+
+                  
                     Console.Write("Ingrese el nombre: ");
                     Console.Write("Ingrese el apellido: ");
+
+                   // GuardarDatos2();
+
                     break;
                 ////////////////////////////////////////////////////////////////////
                 case 6:
+
+                    int vence;
+
+                    if (producto.Count == 0)
+                    {
+                        Console.WriteLine("No hay productos");
+                    }
+                    else
+                    {
+                        List<Productos> reponer = new List<Productos>();
+                        List<Productos> cambio = new List<Productos>();
+
+                        Productos popular = null;
+
+                        foreach (var item in producto)
+                        {
+
+                            ////popular
+                            if (popular == null || item.Value.Vendidos > popular.Vendidos)
+                            {
+                                popular = item.Value;
+                            }
+                            /////reponer
+                            if(item.Value.Cantidad == 0)
+                            {
+                                reponer.Add(item.Value);
+                            }
+                            ////Vencimiento
+                            vence = (item.Value.Fecha - DateTime.Now).Days;
+
+                            if(vence >= 0 && vence<=7)
+                            {
+                                cambio.Add(item.Value);
+                            }
+
+
+                        }
+
+                        if (popular != null)
+                        {
+                            Console.WriteLine("");
+                            Console.WriteLine("----Producto mas vendido----");
+                            Console.WriteLine("| Articulo: " + popular.Nombre + " | Unidades vendidas:  "+ popular.Vendidos +" |");
+                        }
+
+                        if(reponer.Count > 0)
+                        {
+                            Console.WriteLine("");
+                            Console.WriteLine("---Productos a reponer---");
+                            foreach(Productos item in reponer)
+                            {
+                                Console.WriteLine("| Codigo: " + item.Codigo +"| Nombre: " + item.Nombre + "| Sin existecias |");
+                            }
+
+                        }
+
+                        if (cambio.Count > 0)
+                        {
+                            Console.WriteLine("");
+                            Console.WriteLine("---Productos a vencer---");
+                            foreach (Productos item in cambio)
+                            {
+                                Console.WriteLine("| Codigo: " + item.Codigo + "| Nombre: " + item.Nombre + "| fecha: "+ item.Fecha.ToString("dd/MM/yyyy") + " |");
+                            }
+
+                        }
+                    }
+
+                    Console.ReadKey();
+
+
+
                     Console.WriteLine("Proveedor");
                     Console.Write("Ingrese el nombre: ");
                     Console.Write("Ingrese el apellido: ");
-                    break;
 
+                    Console.ReadKey();
+                    break;
 
                 default:
                     Console.WriteLine("Saliendo...");
                     break;
             }
 
-        } while (opcion != 6);
+        } while (opcion != 7);
     }
 }
