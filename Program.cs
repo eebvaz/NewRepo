@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Data.SQLite;
-using static System.Runtime.InteropServices.JavaScript.JSType;
 
 class Persona
 {
@@ -113,117 +112,126 @@ class Proveedor : Persona
         get { return producto; }
         set { producto = value; }
     }
+
+
+    public string MostrarProovedor()
+    {
+        return "| Nombre: " + NombrePersonal +
+               " | Telefono: " + Telefono +
+               " | Distribidor: " + Distribuidor +
+               " | Producto: Q" + Producto +" |";
+    }
 }
 
 //////////////////////////////////////////////////
 
 class Productos
 {
-    private int codigo;
-    private string nombre;
-    private DateTime fecha;
-    private double precio;
-    private int cantidad;
-    private int vendidos;
+    private int codigoProd;
+    private string nombreProd;
+    private DateTime fechaProd;
+    private double precioProd;
+    private int cantidadProd;
+    private int vendidosProd;
 
-    public Productos(int codigo, string nombre, DateTime fecha, double precio, int cantidad, int vendidos)
+    public Productos(int codigoProd, string nombreProd, DateTime fechaProd, double precioProd, int cantidadProd, int vendidosProd)
     {
-        Codigo = codigo;
-        Nombre = nombre;
-        Fecha = fecha;
-        Precio = precio;
-        Cantidad = cantidad;
-        Vendidos = vendidos;
+        CodigoProd = codigoProd;
+        NombreProd = nombreProd;
+        FechaProd = fechaProd;
+        PrecioProd = precioProd;
+        CantidadProd = cantidadProd;
+        VendidosProd = vendidosProd;
     }
 
-    public int Codigo
+    public int CodigoProd
     {
-        get { return codigo; }
+        get { return codigoProd; }
         set
         {
             if (value > 0)
             {
-                codigo = value;
+                codigoProd = value;
             }
         }
     }
 
-    public string Nombre
+    public string NombreProd
     {
-        get { return nombre; }
+        get { return nombreProd; }
         set
         {
             if ((value != null && value.Trim() != ""))
             {
-                nombre = value;
+                nombreProd = value;
             }
         }
     }
 
-    public DateTime Fecha
+    public DateTime FechaProd
     {
-        get { return fecha; }
+        get { return fechaProd; }
         set
         {
             if (value >= DateTime.Now.Date)
             {
-                fecha = value;
+                fechaProd = value;
             }
         }
     }
 
-    public double Precio
+    public double PrecioProd
     {
-        get { return precio; }
+        get { return precioProd; }
         set
         {
             if (value > 0)
             {
-                precio = value;
+                precioProd = value;
             }
         }
     }
 
-    public int Cantidad
+    public int CantidadProd
     {
-        get { return cantidad; }
+        get { return cantidadProd; }
         set
         {
             if (value >= 0)
             {
-                cantidad = value;
+                cantidadProd = value;
             }
         }
     }
 
-    public int Vendidos
+    public int VendidosProd
     {
-        get { return vendidos; }
+        get { return vendidosProd; }
         set
         {
             if (value >= 0)
             {
-                vendidos = value;
+                vendidosProd = value;
             }
         }
     }
 
-    public double Total()
+    public double TotalProd()
     {
-        return precio * cantidad;
+        return precioProd * cantidadProd;
     }
 
     public string EstadoProducto()
     {
-        if (cantidad <= 0)
+        if (cantidadProd <= 0)
         {
             return "No disponible ";
         }
-        else if (fecha < DateTime.Now)
+        else if (fechaProd < DateTime.Now)
         {
             return "Vencido";
         }
-        else if ((fecha - DateTime.Now).Days <= 0)
+        else if ((fechaProd - DateTime.Now).Days <= 0)
         {
             return "Por vencer";
         }
@@ -233,14 +241,14 @@ class Productos
         }
     }
 
-    public string MostrarDatos()
+    public string MostrarDatosProd()
     {
-        return "| Codigo: " + Codigo +
-              " | Nombre: " + Nombre +
-              " | Fecha: " + Fecha.ToShortDateString() +
-              " | Precio: Q" + Precio +
-              " | Cantidad: " + Cantidad +
-              " | Vendidos: " + Vendidos +
+        return "| Codigo: " + CodigoProd +
+              " | Nombre: " + NombreProd +
+              " | Fecha: " + FechaProd.ToShortDateString() +
+              " | Precio: Q" + PrecioProd +
+              " | Cantidad: " + CantidadProd +
+              " | Vendidos: " + VendidosProd +
               " | Estado: " + EstadoProducto();
     }
 }
@@ -250,7 +258,7 @@ class Productos
 class Programa
 {
 
-    private static string conexion = "Data Source=inventario.db";
+    private static string conexion = "Data Source=DatiosTienda.db";
 
     static void CrearTabla()
     {
@@ -270,7 +278,7 @@ class Programa
             );
 
             CREATE TABLE IF NOT EXISTS clientes(
-                id       INTEGER PRIMARY KEY AUTOINCREMENT,
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
                 nombre   TEXT    NOT NULL,
                 telefono TEXT    NOT NULL,
                 tipo     TEXT    NOT NULL,
@@ -278,8 +286,8 @@ class Programa
                 visitas  INTEGER NOT NULL
             );
 
-            CREATE TABLE IF NOT EXISTS proveedores(
-                id           INTEGER PRIMARY KEY AUTOINCREMENT,
+          CREATE TABLE IF NOT EXISTS proveedores(
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
                 nombre       TEXT    NOT NULL,
                 telefono     TEXT    NOT NULL,
                 distribuidor TEXT    NOT NULL,
@@ -304,12 +312,12 @@ class Programa
                 "VALUES(@codigo, @nombre, @fecha, @precio, @cantidad, @vendidos)";
 
             SQLiteCommand comando = new SQLiteCommand(sql, db);
-            comando.Parameters.AddWithValue("@codigo", articulo0.Codigo);
-            comando.Parameters.AddWithValue("@nombre", articulo0.Nombre);
-            comando.Parameters.AddWithValue("@fecha", articulo0.Fecha.ToString());
-            comando.Parameters.AddWithValue("@precio", articulo0.Precio);
-            comando.Parameters.AddWithValue("@cantidad", articulo0.Cantidad);
-            comando.Parameters.AddWithValue("@vendidos", articulo0.Vendidos);
+            comando.Parameters.AddWithValue("@codigo", articulo0.CodigoProd);
+            comando.Parameters.AddWithValue("@nombre", articulo0.NombreProd);
+            comando.Parameters.AddWithValue("@fecha", articulo0.FechaProd.ToString());
+            comando.Parameters.AddWithValue("@precio", articulo0.PrecioProd);
+            comando.Parameters.AddWithValue("@cantidad", articulo0.CantidadProd);
+            comando.Parameters.AddWithValue("@vendidos", articulo0.VendidosProd);
 
             comando.ExecuteNonQuery();
             Console.WriteLine("Producto agregado");
@@ -372,7 +380,7 @@ class Programa
         }
     }
 
-    static void ModificarDatos(Productos articulo1)
+    static void ModificarDatosProductos(Productos articulo1)
     {
         using (SQLiteConnection db = new SQLiteConnection(conexion))
         {
@@ -385,12 +393,12 @@ class Programa
                 "WHERE codigo=@codigo";
 
             SQLiteCommand comando = new SQLiteCommand(sql, db);
-            comando.Parameters.AddWithValue("@codigo", articulo1.Codigo);
-            comando.Parameters.AddWithValue("@nombre", articulo1.Nombre);
-            comando.Parameters.AddWithValue("@fecha", articulo1.Fecha.ToString());
-            comando.Parameters.AddWithValue("@precio", articulo1.Precio);
-            comando.Parameters.AddWithValue("@cantidad", articulo1.Cantidad);
-            comando.Parameters.AddWithValue("@vendidos", articulo1.Vendidos);
+            comando.Parameters.AddWithValue("@codigo", articulo1.CodigoProd);
+            comando.Parameters.AddWithValue("@nombre", articulo1.NombreProd);
+            comando.Parameters.AddWithValue("@fecha", articulo1.FechaProd.ToString());
+            comando.Parameters.AddWithValue("@precio", articulo1.PrecioProd);
+            comando.Parameters.AddWithValue("@cantidad", articulo1.CantidadProd);
+            comando.Parameters.AddWithValue("@vendidos", articulo1.VendidosProd);
 
             int filas = comando.ExecuteNonQuery();
 
@@ -459,6 +467,7 @@ class Programa
                 Console.WriteLine("Proveedor no encontrado");
         }
     }
+
 
     static void EliminarProveedor(string nombre)
     {
@@ -590,14 +599,13 @@ class Programa
         CargarCLientes(clientes);
         CargarProveedor(proveedores);
 
-        int codigo, cantidad, opcion, vender, CodigoDeBarras, vendidos = 0;
-        string productoNuevo;
-        string distribuidorNuevo;
-        string nombre, tipo, nombr3, telefono;
-        DateTime fecha;
-        double deuda, precio;
+        int codigoProd, cantidadProd, opcion, venderProd, CodigoDeBarras, vendidosProd = 0;
+        string productoNuevo,  distribuidorNuevo;
+        string nombreProd, tipoCliente, nombr3, telefono;
+        DateTime fechaProd;
+        double deudatCliente, precioProd;
         bool validacion;
-        int opc, visitas;
+        int opc, visitastCliente;
 
        
 
@@ -625,8 +633,10 @@ class Programa
                 ////////////////////////////////////////////////////////////////////
                 case 1:
                     Console.Clear();
+
                     Console.WriteLine("------------Vender Producto-----------");
-                    double PrecioTotal = 0;
+                    double PrecioTotal = 0, general = 0;
+
                     do
                     {
 
@@ -646,7 +656,7 @@ class Programa
                         {
 
 
-                            if (producto[CodigoDeBarras].Cantidad <= 0)
+                            if (producto[CodigoDeBarras].CantidadProd <= 0)
                             {
                                 Console.WriteLine("No hay existencias");
                             }
@@ -655,37 +665,40 @@ class Programa
                             {
                                 do
                                 {                                    //-----------------------------------//
-                                    Console.Write("| Producto: " + producto[CodigoDeBarras].Nombre + " | Precio: " + producto[CodigoDeBarras].Precio);
+                                    Console.Write("| Producto: " + producto[CodigoDeBarras].NombreProd + " | Precio: " + producto[CodigoDeBarras].PrecioProd);
                                     Console.Write(" | Ingrese la cantidad: ");
-                                    validacion = int.TryParse(Console.ReadLine(), out vender);
-                                    if (!validacion || vender <= 0)
+                                    validacion = int.TryParse(Console.ReadLine(), out venderProd);
+                                    if (!validacion || venderProd <= 0)
                                     {
                                         Console.WriteLine("Cantidad invalida");
                                         validacion = false;
-                                        
+
                                     }
                                 } while (!validacion);
 
-                                if (vender > producto[CodigoDeBarras].Cantidad)
+                                if (venderProd > producto[CodigoDeBarras].CantidadProd)
                                 {
                                     Console.WriteLine("No hay existencias");
                                 }
                                 else
                                 {
-                                    producto[CodigoDeBarras].Cantidad -= vender;
-                                    producto[CodigoDeBarras].Vendidos += vender;
+                                    producto[CodigoDeBarras].CantidadProd -= venderProd;
+                                    producto[CodigoDeBarras].VendidosProd += venderProd;
 
-                                    double general = vender * producto[CodigoDeBarras].Precio;
+                                    general = venderProd * producto[CodigoDeBarras].PrecioProd;
+
+
                                     PrecioTotal += general;
 
+                                    ModificarDatosProductos(producto[CodigoDeBarras]);
 
-                                    ModificarDatos(producto[CodigoDeBarras]);
                                     Console.WriteLine("");
                                     Console.WriteLine("Venta realizada");
                                     Console.WriteLine("Total: Q" + general);
+                                    Console.ReadKey();
                                 }
                             }
-                  
+
                         }
                         else
                         {
@@ -707,7 +720,7 @@ class Programa
                         } while (!validacion);
 
                     } while (opc == 1);
-                    Console.ReadKey();
+
                     break;
 
 
@@ -724,42 +737,42 @@ class Programa
                         {
                             //-----------------------------------//
                             Console.Write("Ingrese el codigo de producto: ");
-                            validacion = int.TryParse(Console.ReadLine(), out codigo);
+                            validacion = int.TryParse(Console.ReadLine(), out codigoProd);
                             if (!validacion)
                             {
                                 Console.WriteLine("codigo invalido");
                             }
                         } while (!validacion);
 
-                        if (producto.ContainsKey(codigo))
+                        if (producto.ContainsKey(codigoProd))
                         {
                             Console.WriteLine("Producto ya existente");
                         }
 
                         else
-                        
+
                         {
                             //-----------------------------------//
 
                             do
                             {
                                 Console.Write("Ingrese el nombre: ");
-                                nombre = Console.ReadLine().Trim(); 
-                                if (nombre == "")
+                                nombreProd = Console.ReadLine().Trim();
+                                if (nombreProd == "")
                                 {
                                     Console.WriteLine("Erroir ");
                                 }
-                            } 
-                            while (nombre == "");
-                                
-                           nombre = nombre.Substring(0, 1).ToUpper() + nombre.Substring(1).ToLower();
-                                
+                            }
+                            while (nombreProd == "");
+
+                            nombreProd = nombreProd.Substring(0, 1).ToUpper() + nombreProd.Substring(1).ToLower();
+
                             //-----------------------------------//
                             do
                             {
                                 Console.Write("Ingrese fecha vencimiento: ");
-                                validacion = DateTime.TryParse(Console.ReadLine(), out fecha);
-                                if (!validacion || fecha.Date < DateTime.Now.Date)
+                                validacion = DateTime.TryParse(Console.ReadLine(), out fechaProd);
+                                if (!validacion || fechaProd.Date < DateTime.Now.Date)
                                 {
                                     Console.WriteLine("Fecha invalida");
                                     validacion = false;
@@ -771,8 +784,8 @@ class Programa
                             do
                             {
                                 Console.Write("Ingrese el precio: ");
-                                validacion = double.TryParse(Console.ReadLine(), out precio);
-                                if (!validacion || precio <= 0)
+                                validacion = double.TryParse(Console.ReadLine(), out precioProd);
+                                if (!validacion || precioProd <= 0)
                                 {
                                     Console.WriteLine("Precio invalido");
                                     validacion = false;
@@ -783,8 +796,8 @@ class Programa
                             do
                             {
                                 Console.Write("Ingrese la cantidad: ");
-                                validacion = int.TryParse(Console.ReadLine(), out cantidad);
-                                if (!validacion || cantidad < 0) 
+                                validacion = int.TryParse(Console.ReadLine(), out cantidadProd);
+                                if (!validacion || cantidadProd < 0)
                                 {
                                     Console.WriteLine("Cantidad invalida");
                                     validacion = false;
@@ -795,8 +808,8 @@ class Programa
 
                             try
                             {
-                                Productos almacenar = new Productos(codigo, nombre, fecha, precio, cantidad, vendidos);
-                                producto.Add(codigo, almacenar);
+                                Productos almacenar = new Productos(codigoProd, nombreProd, fechaProd, precioProd, cantidadProd, vendidosProd);
+                                producto.Add(codigoProd, almacenar);
                                 GuardarDatos1(almacenar);
                             }
                             catch (ArgumentException ex)
@@ -806,7 +819,7 @@ class Programa
 
 
                         }
-
+                        Console.WriteLine("");
                         Console.WriteLine("Desea agregar otro producto");
                         Console.WriteLine("1: Si");
                         Console.WriteLine("2: No");
@@ -847,7 +860,7 @@ class Programa
 
                     if (producto.ContainsKey(CodigoDeBarras))
                     {
-                        Console.WriteLine(producto[CodigoDeBarras].MostrarDatos());
+                        Console.WriteLine(producto[CodigoDeBarras].MostrarDatosProd());
 
                         do
                         {
@@ -877,7 +890,7 @@ class Programa
                                     do
                                     {
                                         Console.Clear();
-                                        Console.WriteLine(producto[CodigoDeBarras].MostrarDatos());
+                                        Console.WriteLine(producto[CodigoDeBarras].MostrarDatosProd());
                                         Console.WriteLine("");
                                         Console.WriteLine("Que deseas editar");
                                         Console.WriteLine("Opcion 1: Nombre");
@@ -905,11 +918,11 @@ class Programa
                                                 do
                                                 {
                                                     Console.Write("Nuevo nombre: ");
-                                                    nombre = Console.ReadLine().Trim();
-                                                    if (nombre == "")
+                                                    nombreProd = Console.ReadLine().Trim();
+                                                    if (nombreProd == "")
                                                         Console.WriteLine("Nombre invalido");
-                                                } while (nombre == "");
-                                                producto[CodigoDeBarras].Nombre = nombre.Substring(0, 1).ToUpper() + nombre.Substring(1).ToLower();
+                                                } while (nombreProd == "");
+                                                producto[CodigoDeBarras].NombreProd = nombreProd.Substring(0, 1).ToUpper() + nombreProd.Substring(1).ToLower();
                                                 //-----------------------------------//
                                                 break;
                                             case 2:
@@ -917,14 +930,14 @@ class Programa
                                                 do
                                                 {
                                                     Console.Write("Nueva Fecha: ");
-                                                    validacion = DateTime.TryParse(Console.ReadLine(), out fecha);
-                                                    if (!validacion || fecha.Date < DateTime.Now.Date)
+                                                    validacion = DateTime.TryParse(Console.ReadLine(), out fechaProd);
+                                                    if (!validacion || fechaProd.Date < DateTime.Now.Date)
                                                     {
                                                         Console.WriteLine("Fecha invalida");
                                                         validacion = false;
                                                     }
                                                 } while (!validacion);
-                                                producto[CodigoDeBarras].Fecha = fecha;
+                                                producto[CodigoDeBarras].FechaProd = fechaProd;
                                                 //-----------------------------------//
                                                 break;
                                             case 3:
@@ -932,14 +945,14 @@ class Programa
                                                 do
                                                 {
                                                     Console.Write("Nuevo Precio: ");
-                                                    validacion = double.TryParse(Console.ReadLine(), out precio);
-                                                    if (!validacion || precio <= 0)
+                                                    validacion = double.TryParse(Console.ReadLine(), out precioProd);
+                                                    if (!validacion || precioProd <= 0)
                                                     {
                                                         Console.WriteLine("Precio invalido");
                                                         validacion = false;
                                                     }
                                                 } while (!validacion);
-                                                producto[CodigoDeBarras].Precio = precio;
+                                                producto[CodigoDeBarras].PrecioProd = precioProd;
                                                 //-----------------------------------//
                                                 break;
                                             case 4:
@@ -947,14 +960,14 @@ class Programa
                                                 do
                                                 {
                                                     Console.Write("Nueva cantidad: ");
-                                                    validacion = int.TryParse(Console.ReadLine(), out cantidad);
-                                                    if (!validacion || cantidad < 0)
+                                                    validacion = int.TryParse(Console.ReadLine(), out cantidadProd);
+                                                    if (!validacion || cantidadProd < 0)
                                                     {
                                                         Console.WriteLine("Cantidad invalida");
                                                         validacion = false;
                                                     }
                                                 } while (!validacion);
-                                                producto[CodigoDeBarras].Cantidad = cantidad;
+                                                producto[CodigoDeBarras].CantidadProd = cantidadProd;
                                                 //-----------------------------------//
                                                 break;
                                             case 5:
@@ -962,50 +975,50 @@ class Programa
                                                 do
                                                 {
                                                     Console.Write("Nuevo nombre: ");
-                                                    nombre = Console.ReadLine().Trim();
-                                                    if (nombre == "")
+                                                    nombreProd = Console.ReadLine().Trim();
+                                                    if (nombreProd == "")
                                                         Console.WriteLine("Nombre invalido");
-                                                } while (nombre == "");
-                                                producto[CodigoDeBarras].Nombre = nombre.Substring(0, 1).ToUpper() + nombre.Substring(1).ToLower();
+                                                } while (nombreProd == "");
+                                                producto[CodigoDeBarras].NombreProd = nombreProd.Substring(0, 1).ToUpper() + nombreProd.Substring(1).ToLower();
 
                                                 //-----------------------------------//
                                                 do
                                                 {
                                                     Console.Write("Nueva Fecha: ");
-                                                    validacion = DateTime.TryParse(Console.ReadLine(), out fecha);
-                                                    if (!validacion || fecha.Date < DateTime.Now.Date)
+                                                    validacion = DateTime.TryParse(Console.ReadLine(), out fechaProd);
+                                                    if (!validacion || fechaProd.Date < DateTime.Now.Date)
                                                     {
                                                         Console.WriteLine("Fecha invalida");
                                                         validacion = false;
                                                     }
                                                 } while (!validacion);
-                                                producto[CodigoDeBarras].Fecha = fecha;
+                                                producto[CodigoDeBarras].FechaProd = fechaProd;
 
                                                 //-----------------------------------//
                                                 do
                                                 {
                                                     Console.Write("Nuevo Precio: ");
-                                                    validacion = double.TryParse(Console.ReadLine(), out precio);
-                                                    if (!validacion || precio <= 0)
+                                                    validacion = double.TryParse(Console.ReadLine(), out precioProd);
+                                                    if (!validacion || precioProd <= 0)
                                                     {
                                                         Console.WriteLine("Precio invalido");
                                                         validacion = false;
                                                     }
                                                 } while (!validacion);
-                                                producto[CodigoDeBarras].Precio = precio;
+                                                producto[CodigoDeBarras].PrecioProd = precioProd;
 
                                                 //-----------------------------------//
                                                 do
                                                 {
                                                     Console.Write("Nueva cantidad: ");
-                                                    validacion = int.TryParse(Console.ReadLine(), out cantidad);
-                                                    if (!validacion || cantidad < 0)
+                                                    validacion = int.TryParse(Console.ReadLine(), out cantidadProd);
+                                                    if (!validacion || cantidadProd < 0)
                                                     {
                                                         Console.WriteLine("Cantidad invalida");
                                                         validacion = false;
                                                     }
                                                 } while (!validacion);
-                                                producto[CodigoDeBarras].Cantidad = cantidad;
+                                                producto[CodigoDeBarras].CantidadProd = cantidadProd;
                                                 //-----------------------------------//
                                                 break;
 
@@ -1015,7 +1028,7 @@ class Programa
 
                                     } while (opc != 6);
 
-                                    ModificarDatos(producto[CodigoDeBarras]);
+                                    ModificarDatosProductos(producto[CodigoDeBarras]);
                                     Console.ReadKey();
                                     break;
 
@@ -1049,9 +1062,9 @@ class Programa
 
                         foreach (var item in producto)
                         {
-                            Console.WriteLine(item.Value.MostrarDatos() + "| Valor total: Q" + item.Value.Total() + " |");
+                            Console.WriteLine(item.Value.MostrarDatosProd() + "| Valor total: Q" + item.Value.TotalProd() + " |");
 
-                            if (popular == null || item.Value.Vendidos > popular.Vendidos)
+                            if (popular == null || item.Value.VendidosProd > popular.VendidosProd)
                             {
                                 popular = item.Value;
                             }
@@ -1060,8 +1073,8 @@ class Programa
                         if (popular != null)
                         {
                             Console.WriteLine("");
-                            Console.WriteLine("Producto mas vendido: " + popular.Nombre);
-                            Console.WriteLine("Cantidad mas vendida: " + popular.Vendidos);
+                            Console.WriteLine("Producto mas vendido: " + popular.NombreProd);
+                            Console.WriteLine("Cantidad mas vendida: " + popular.VendidosProd);
                         }
                     }
                     Console.ReadKey();
@@ -1075,8 +1088,9 @@ class Programa
                     Console.WriteLine("|-------- Gestionar Cliente --------|");
                     Console.WriteLine("| Opcion 1: Agregar                 |");
                     Console.WriteLine("| Opcion 2: Mostrar                 |");
-                    Console.WriteLine("| Opcion 3: Modificar               |");
-                    Console.WriteLine("| Opcion 4: Regresar                |");
+                    Console.WriteLine("| Opcion 3: Eliminar                |");
+                    Console.WriteLine("| Opcion 4: Modificar               |");
+                    Console.WriteLine("| Opcion 5: Regresar                |");
                     Console.WriteLine("|-----------------------------------|");
                     Console.Write("           Opcion: ");
                     while (!int.TryParse(Console.ReadLine(), out opcion))
@@ -1088,23 +1102,248 @@ class Programa
                     {
                         //////////////////////////////////////////////////////
                         case 1:
-                          
+                            Console.Clear();
+
+                            Console.WriteLine("-------ClIENTES--------- ");
+                            //-----------------------------------//
+
+                            do
+                            {
+                                Console.Write("Ingrese el nombre: ");
+                                nombr3 = Console.ReadLine().Trim();
+                                if (nombr3 == "")
+                                {
+                                    Console.WriteLine("Erroir ");
+                                }
+                            }
+                            while (nombr3 == "");
+
+                            nombr3 = nombr3.Substring(0, 1).ToUpper() + nombr3.Substring(1).ToLower();
+
+                            //-----------------------------------//
+                            do
+                            {
+                                Console.Write("Ingrese el telefono: ");
+                                telefono = Console.ReadLine().Trim();
+                                if (telefono.Length != 8)
+                                {
+                                    Console.WriteLine("datos insuficients del numero telefonico");
+                                }
+                            } while (telefono.Length != 8);
+
+                            //-----------------------------------//
+
+                            do
+                            {
+
+                                Console.WriteLine("[Casual | Frecuente] ");
+                                Console.Write("Ingrese el tipo de cliente ");
+                                tipoCliente = Console.ReadLine().Trim();
+                                if (tipoCliente == "")
+                                {
+                                    Console.WriteLine("Erroir ");
+                                }
+                            }
+                            while (tipoCliente == "");
+
+                            tipoCliente = tipoCliente.Substring(0, 1).ToUpper() + tipoCliente.Substring(1).ToLower();
+
+                            //-----------------------------------//
+                            do
+                            {
+                                Console.Write("Ingrese la deuda: Q");
+                                validacion = double.TryParse(Console.ReadLine(), out deudatCliente);
+                                if (!validacion)
+                                {
+                                    Console.WriteLine("Error de dato");
+                                }
+                            } while (!validacion);
+
+                            //-----------------------------------//
+                            do
+                            {
+                                Console.Write("Numero de visitas: ");
+                                validacion = int.TryParse(Console.ReadLine(), out visitastCliente);
+                                if (!validacion)
+                                {
+                                    Console.WriteLine("Error de dato");
+                                }
+                            } while (!validacion);
+
+                            //-----------------------------------//
+
+                            try
+                            {
+                                Cliente clienteDatos = new Cliente(nombr3, telefono, tipoCliente, deudatCliente, visitastCliente);
+                                clientes.Add(nombr3, clienteDatos);
+                                GuardarDato2(clienteDatos);
+                            }
+                            catch (ArgumentException ex)
+                            {
+                                Console.WriteLine("Error al guardar: " + ex.Message);
+                            }
+
+                            Console.ReadKey();
                             break;
                         //////////////////////////////////////////////////////
                         case 2:
                             Console.Clear();
-                            
+                            Console.WriteLine();
+                            Console.WriteLine("- - Lista de clientes ---");
+
+                            if (clientes.Count == 0)
+                            {
+                                Console.WriteLine("No hay clientes");
+                            }
+                            else
+                            {
+                                foreach (var item in clientes)
+                                {
+                                    Console.WriteLine(item.Value.MostrarCliente());
+                                }
+
+
+                            }
+
                             Console.ReadKey();
                             break;
                         //////////////////////////////////////////////////////
                         case 3:
-
                             Console.Clear();
+                            Console.WriteLine("Borrrar deuda: ");
+                            do
+                            {
+                                Console.Write("Ingrese el nombre: ");
+                                nombr3 = Console.ReadLine().Trim();
+                                if (nombr3 == "")
+                                {
+                                    Console.WriteLine("Error ");
+                                }
+                            }
+                            while (nombr3 == "");
 
-                           
+                            nombr3 = nombr3.Substring(0, 1).ToUpper() + nombr3.Substring(1).ToLower();
+
+                            if (clientes.ContainsKey(nombr3))
+                            {
+                                Console.WriteLine("Desea borrarlo: ");
+                                Console.WriteLine("Opcion 1: si");
+                                Console.WriteLine("Opcion 2: no ");
+                                opcion = int.Parse(Console.ReadLine());
+
+                                if (opcion == 1)
+                                {
+                                    clientes.Remove(nombr3);
+                                    EliminarCliente(nombr3);
+                                    Console.WriteLine("Se ha eliminado");
+                                }
+                                else
+                                {
+                                    Console.WriteLine("Regresando...");
+                                }
+
+                            }
 
 
-                        
+                            Console.ReadKey();
+                            break;
+                        case 4:
+                            do
+                            {
+                                Console.Write("Ingrese el nombre: ");
+                                nombr3 = Console.ReadLine().Trim();
+                                if (nombr3 == "")
+                                {
+                                    Console.WriteLine("Error ");
+                                }
+                            }
+                            while (nombr3 == "");
+
+                            nombr3 = nombr3.Substring(0, 1).ToUpper() + nombr3.Substring(1).ToLower();
+
+                            do
+                            {
+                                Console.Clear();
+                                Console.WriteLine(clientes[nombr3].MostrarCliente());
+                                Console.WriteLine("");
+                                Console.WriteLine("Que deseas editar");
+                                Console.WriteLine("Opcion 1: Deuda");
+                                Console.WriteLine("Opcion 2: Visitas");
+                                Console.WriteLine("Opcion 3: Telefono");
+                                Console.WriteLine("Opcion 4: Terminar de editar");
+                                //-----------------------------------//
+                                do
+                                {
+                                    Console.Write("Opcion: ");
+                                    validacion = int.TryParse(Console.ReadLine(), out opc);
+                                    if (!validacion)
+                                    {
+                                        Console.WriteLine("opcion invalida");
+                                        validacion = false;
+                                    }
+                                } while (!validacion);
+                                //-----------------------------------//
+                                switch (opc)
+                                {
+                                    case 1:
+
+                                        //-----------------------------------//
+                                        do
+                                        {
+                                            Console.Write("Ingrese la deuda: Q");
+                                            validacion = double.TryParse(Console.ReadLine(), out deudatCliente);
+                                            if (!validacion)
+                                            {
+                                                Console.WriteLine("Error de dato");
+                                            }
+                                        } while (!validacion);
+
+                                        clientes[nombr3].Deuda = deudatCliente;
+                                        break;
+                                    case 2:
+                                        //-----------------------------------//
+                                        do
+                                        {
+                                            Console.Write("Numero de visitas: ");
+                                            validacion = int.TryParse(Console.ReadLine(), out visitastCliente);
+                                            if (!validacion)
+                                            {
+                                                Console.WriteLine("Error de dato");
+                                            }
+                                        } while (!validacion);
+
+                                        clientes[nombr3].Visitas = visitastCliente;
+                                        //-----------------------------------//
+                                        break;
+                                    case 3:
+                                        //-----------------------------------//
+                                        do
+                                        {
+                                            Console.Write("Ingrese el telefono: ");
+                                            telefono = Console.ReadLine().Trim();
+                                            if (telefono.Length != 8)
+                                            {
+                                                Console.WriteLine("datos insuficients del numero telefonico");
+                                            }
+                                        } while (telefono.Length != 8);
+                                        clientes[nombr3].Telefono = telefono;
+
+                                        //-----------------------------------//
+
+                                        break;
+
+                                    default:
+                                        break;
+                                }
+
+                            } while (opc != 4);
+
+                            ModificarCliente(nombr3, clientes[nombr3]);
+
+                            Console.ReadKey();
+
+
+                            ///-------------------------------------------////
                             break;
 
                         default:
@@ -1115,253 +1354,266 @@ class Programa
 
                 ////////////////////////////////////////////////////////////////////
                 case 6:
-                    Console.Clear();
-                    Console.WriteLine("|-------- Gestionar Proveedor ------|");
-                    Console.WriteLine("| Opcion 1: Agregar                 |");
-                    Console.WriteLine("| Opcion 2: Mostrar                 |");
-                    Console.WriteLine("| Opcion 3: Borrar                  |");
-                    Console.WriteLine("| Opcion 4: Regresar                |");
-                    Console.WriteLine("|-----------------------------------|");
-                    Console.Write("           Opcion: ");
-                    while (!int.TryParse(Console.ReadLine(), out opcion))
+                    do
                     {
-                        Console.WriteLine("Error de dato");
-                    }
+                        Console.Clear();
+                        Console.WriteLine("|-------- Gestionar Proveedor ------|");
+                        Console.WriteLine("| Opcion 1: Agregar                 |");
+                        Console.WriteLine("| Opcion 2: Mostrar                 |");
+                        Console.WriteLine("| Opcion 3: Eliminar                |");
+                        Console.WriteLine("| Opcion 4: Modificar               |");
+                        Console.WriteLine("| Opcion 5: Regresar                |");
+                        Console.WriteLine("|-----------------------------------|");
+                        Console.Write("           Opcion: ");
+                        while (!int.TryParse(Console.ReadLine(), out opcion))
+                        {
+                            Console.WriteLine("Error de dato");
+                        }
 
-                    switch (opcion)
-                    {
-                        case 1:
-                            Console.Clear();
-                            Console.WriteLine("--------- Agregar Proveedor --------");
-
-                            //-----------------------------------//
-                            do
-                            {
-                                Console.Write("Ingrese el nombre: ");
-                                !validacion = string(Console.ReadLine(), out );
-                                if (!validacion)
-                                {
-                                    Console.WriteLine("Nombre invalido");
-                                }
-                            } while (!validacion);
-
-                            nombr3 = nombr3.Substring(0, 1).ToUpper() + nombr3.Substring(1).ToLower();
-
-                            if (proveedores.ContainsKey(nombr3))
-                            {
-                                Console.WriteLine("Proveedor ya existe");
-
-                                Console.ReadKey();
-                            }
-
-                            //-----------------------------------//
+                        switch (opcion)
+                        {
+                            case 1:
+                                Console.Clear();
                            
 
-                            //-----------------------------------//
-                       
-                        
-
-                            //-----------------------------------//
-                          
-                   
-
-                            //-----------------------------------//
-                       
-                            break;
-
-                        case 2:
-                            Console.Clear();
-                            if (proveedores.Count == 0)
-                            {
-                                Console.WriteLine("No hay proveedores");
-                            }
-                            else
-                            {
-                                Console.WriteLine("-------- Proveedores --------");
-                                foreach (var item in proveedores)
-                                {
-                                    Console.WriteLine(
-                                        "| Nombre:       " + item.Value.NombrePersonal +
-                                        " | Telefono:     " + item.Value.Telefono +
-                                        " | Distribuidor: " + item.Value.Distribuidor +
-                                        " | Producto:     " + item.Value.Producto + " |");
-                                }
-                            }
-                            Console.ReadKey();
-                            break;
-
-                        case 3:
-                            Console.Clear();
-
-                            //-----------------------------------//
-                            do
-                            {
-                                Console.Write("Ingrese el nombre del proveedor: ");
-                                nombr3 = Console.ReadLine().Trim();
-                                if (nombr3 == "")
-                                    Console.WriteLine("Nombre invalido");
-                            } while (nombr3 == "");
-                            nombr3 = nombr3.Substring(0, 1).ToUpper() + nombr3.Substring(1).ToLower();
-                            //-----------------------------------//
-
-                            if (proveedores.ContainsKey(nombr3))
-                            {
-                                Console.WriteLine("");
-                                Console.WriteLine("| Nombre:       " + proveedores[nombr3].NombrePersonal);
-                                Console.WriteLine("| Telefono:     " + proveedores[nombr3].Telefono);
-                                Console.WriteLine("| Distribuidor: " + proveedores[nombr3].Distribuidor);
-                                Console.WriteLine("| Producto:     " + proveedores[nombr3].Producto);
+                                Console.Write("-------Provedor--------- ");
+                                //-----------------------------------//
 
                                 do
                                 {
-                          Console.WriteLine("");
-                          Console.WriteLine("¿Que desea realizar?");
-                          Console.WriteLine("Opcion 1: Borrar");
-                                    Console.WriteLine("Opcion 2: Editar");
-                                    Console.WriteLine("Opcion 3: Regresar");
-                                    while (!int.TryParse(Console.ReadLine(), out opcion))
+                                    Console.Write("Ingrese el nombre: ");
+                                    nombr3 = Console.ReadLine().Trim();
+                                    if (nombr3 == "")
                                     {
-                                        Console.WriteLine("Error de dato");
+                                        Console.WriteLine("Erroir ");
+                                    }
+                                }
+                                while (nombr3 == "");
+
+                                nombr3 = nombr3.Substring(0, 1).ToUpper() + nombr3.Substring(1).ToLower();
+
+                                //-----------------------------------//
+                                do
+                                {
+                                    Console.Write("Ingrese el telefono: ");
+                                    telefono = Console.ReadLine().Trim();
+                                    if (telefono.Length != 8)
+                                    {
+                                        Console.WriteLine("datos insuficients del numero telefonico");
+                                    }
+                                } while (telefono.Length != 8);
+
+                                //-----------------------------------//
+
+                                do
+                                {
+                                    Console.Write("Ingrese el provedor: ");
+                                    distribuidorNuevo = Console.ReadLine().Trim();
+                                    if (distribuidorNuevo == "")
+                                    {
+                                        Console.WriteLine("Error ");
+                                    }
+                                }
+                                while (distribuidorNuevo == "");
+
+                                distribuidorNuevo = distribuidorNuevo.Substring(0, 1).ToUpper() + distribuidorNuevo.Substring(1).ToLower();
+
+                                //-----------------------------------//
+                                do
+                                {
+                                    Console.Write("Ingrese el producto: ");
+                                    productoNuevo = Console.ReadLine().Trim();
+                                    if (productoNuevo == "")
+                                    {
+                                        Console.WriteLine("Error ");
+                                    }
+                                }
+                                while (distribuidorNuevo == "");
+
+                                productoNuevo = productoNuevo.Substring(0, 1).ToUpper() + productoNuevo.Substring(1).ToLower();
+
+                        
+                                //-----------------------------------//
+
+                                try
+                                {
+                                    Proveedor distribuidors = new Proveedor(nombr3, telefono, distribuidorNuevo, productoNuevo);
+                                    proveedores.Add(nombr3, distribuidors);
+                                    GuardarDato3(distribuidors);
+                                }
+                                catch (ArgumentException ex)
+                                {
+                                    Console.WriteLine("Error al guardar: " + ex.Message);
+                                }
+
+                              
+                                Console.ReadKey();
+                                break;
+                            case 2:
+                                Console.Clear();
+
+                                Console.WriteLine("---- Lista de Proveedors ---");
+
+                                if (proveedores.Count == 0)
+                                {
+                                    Console.WriteLine("No hay provedores");
+                                }
+                                else
+                                {
+                                    foreach (var item in proveedores)
+                                    {
+                                        Console.WriteLine(item.Value.MostrarProovedor());
                                     }
 
-                                    switch (opcion)
+
+                                }
+
+                                Console.ReadKey();
+
+                                break;
+                            case 3:
+                                Console.Clear();
+                                Console.Write("Borrrar Proovedor: ");
+                                do
+                                {
+                                    Console.Write("Ingrese el nombre: ");
+                                    nombr3 = Console.ReadLine().Trim();
+                                    if (nombr3 == "")
+                                    {
+                                        Console.WriteLine("Error ");
+                                    }
+                                }
+                                while (nombr3 == "");
+
+                                nombr3 = nombr3.Substring(0, 1).ToUpper() + nombr3.Substring(1).ToLower();
+
+                                if (clientes.ContainsKey(nombr3))
+                                {
+                                    Console.WriteLine("Desea borrarlo: ");
+                                    Console.WriteLine("Opcion 1: si");
+                                    Console.WriteLine("Opcion 2: no ");
+                                    opcion = int.Parse(Console.ReadLine());
+
+                                    if (opcion == 1)
+                                    {
+                                        proveedores.Remove(nombr3);
+                                        EliminarProveedor(nombr3);
+                                        Console.WriteLine("Se ha eliminado");
+                                    }
+                                    else
+                                    {
+                                        Console.WriteLine("Regresando...");
+                                    }
+
+                                }
+                                Console.ReadKey();
+                                break;
+                            case 4:
+                                do
+                                {
+                                    Console.Write("Ingrese el nombre: ");
+                                    nombr3 = Console.ReadLine().Trim();
+                                    if (nombr3 == "")
+                                    {
+                                        Console.WriteLine("Error ");
+                                    }
+                                }
+                                while (nombr3 == "");
+
+                                nombr3 = nombr3.Substring(0, 1).ToUpper() + nombr3.Substring(1).ToLower();
+
+                                do
+                                {
+                                    Console.Clear();
+                                    Console.WriteLine(proveedores[nombr3].MostrarProovedor());
+                                    Console.WriteLine("");
+                                    Console.WriteLine("Que deseas editar");
+                                    Console.WriteLine("Opcion 1: Distribuidor");
+                                    Console.WriteLine("Opcion 2: Producto");
+                                    Console.WriteLine("Opcion 3: Telefono");
+                                    Console.WriteLine("Opcion 4: Terminar de editar");
+                                    //-----------------------------------//
+                                    do
+                                    {
+                                        Console.Write("Opcion: ");
+                                        validacion = int.TryParse(Console.ReadLine(), out opc);
+                                        if (!validacion)
+                                        {
+                                            Console.WriteLine("opcion invalida");
+                                            validacion = false;
+                                        }
+                                    } while (!validacion);
+                                    //-----------------------------------//
+                                    switch (opc)
                                     {
                                         case 1:
+
                                             //-----------------------------------//
-                                            proveedores.Remove(nombr3);
-                                            EliminarProveedor(nombr3);
-                                            Console.WriteLine("Proveedor eliminado");
-                                            Console.ReadKey();
-                                            break;
-
-                                        case 2:
-                                            Console.Clear();
-                                            Console.WriteLine("---------Editar Proveedor---------");
-
                                             do
                                             {
-                                                Console.Clear();
-                                                Console.WriteLine("| Nombre:       " + proveedores[nombr3].NombrePersonal);
-                                                Console.WriteLine("| Telefono:     " + proveedores[nombr3].Telefono);
-                                                Console.WriteLine("| Distribuidor: " + proveedores[nombr3].Distribuidor);
-                                                Console.WriteLine("| Producto:     " + proveedores[nombr3].Producto);
-                                                Console.WriteLine("");
-                                                Console.WriteLine("Que deseas editar");
-                                                Console.WriteLine("Opcion 1: Nombre");
-                                                Console.WriteLine("Opcion 2: Telefono");
-                                                Console.WriteLine("Opcion 3: Distribuidor");
-                                                Console.WriteLine("Opcion 4: Producto");
-                                                Console.WriteLine("Opcion 5: Terminar de editar");
-
-                                                //-----------------------------------//
-                                                do
+                                                distribuidorNuevo = Console.ReadLine().Trim();
+                                                if (distribuidorNuevo == "")
                                                 {
-                                                    Console.Write("Opcion: ");
-                                                    validacion = int.TryParse(Console.ReadLine(), out opc);
-                                                    if (!validacion)
-                                                    {
-                                                        Console.WriteLine("Opcion invalida");
-                                                        validacion = false;
-                                                    }
-                                                } while (!validacion);
-                                                //-----------------------------------//
-
-                                                switch (opc)
-                                                {
-                                                    case 1:
-                                                        //-----------------------------------//
-                                                        string nombreViejoP = nombr3;
-                                                        do
-                                                        {
-                                                            Console.Write("Nuevo nombre: ");
-                                                            nombr3 = Console.ReadLine().Trim();
-                                                            if (nombr3 == "")
-                                                            {
-                                                                Console.WriteLine("Nombre invalido");
-                                                            }
-                                                        } while (nombr3 == "");
-                                                        nombr3 = nombr3.Substring(0, 1).ToUpper() + nombr3.Substring(1).ToLower();
-
-                                                        Proveedor tempP = proveedores[nombreViejoP];
-                                                        tempP.NombrePersonal = nombr3;
-                                                        proveedores.Remove(nombreViejoP);
-                                                        proveedores[nombr3] = tempP;
-                                                        EliminarProveedor(nombreViejoP);
-                                                        GuardarDato3(proveedores[nombr3]);
-                                                        //-----------------------------------//
-                                                        break;
-
-                                                    case 2:
-                                                        //-----------------------------------//
-                                                        do
-                                                        {
-                                                            Console.Write("Nuevo telefono: ");
-                                                            telefono = Console.ReadLine().Trim();
-                                                            if (telefono.Length != 8)
-                                                            {
-                                                                Console.WriteLine("Telefono invalido");
-                                                            }
-                                                        } while (telefono.Length != 8);
-                                                        proveedores[nombr3].Telefono = telefono;
-                                                        //-----------------------------------//
-                                                        break;
-
-                                                    case 3:
-                                                        //-----------------------------------//
-                                                        do
-                                                        {
-                                                            Console.Write("Nuevo distribuidor: ");
-                                                            distribuidorNuevo = Console.ReadLine().Trim();
-                                                            if (distribuidorNuevo == "")
-                                                            {
-                                                                Console.WriteLine("Distribuidor invalido");
-                                                            }
-                                                        } while (distribuidorNuevo == "");
-                                                        proveedores[nombr3].Distribuidor = distribuidorNuevo.Substring(0, 1).ToUpper() + distribuidorNuevo.Substring(1).ToLower();
-                                                        //-----------------------------------//
-                                                        break;
-
-                                                    case 4:
-                                                        //-----------------------------------//
-                                                        do
-                                                        {
-                                                            Console.Write("Nuevo producto: ");
-                                                            productoNuevo = Console.ReadLine().Trim();
-                                                            if (productoNuevo == "")
-                                                            {
-                                                                Console.WriteLine("Producto invalido");
-                                                            }
-                                                        } while (productoNuevo == "");
-                                                        proveedores[nombr3].Producto = productoNuevo.Substring(0, 1).ToUpper() + productoNuevo.Substring(1).ToLower();
-                                                        //-----------------------------------//
-                                                        break;
-
-                                                    default:
-                                                        break;
+                                                    Console.WriteLine("Error ");
                                                 }
+                                            }
+                                            while (distribuidorNuevo == "");
 
-                                            } while (opc != 5);
+                                            distribuidorNuevo = distribuidorNuevo.Substring(0, 1).ToUpper() + distribuidorNuevo.Substring(1).ToLower();
 
-                                            ModificarProveedor(nombr3, proveedores[nombr3]);
-                                            Console.ReadKey();
+                                            proveedores[nombr3].Distribuidor = distribuidorNuevo;
+                                            break;
+                                        case 2:
+                                            //-----------------------------------//
+                                            do
+                                            {
+                                                productoNuevo = Console.ReadLine().Trim();
+                                                if (productoNuevo == "")
+                                                {
+                                                    Console.WriteLine("Error ");
+                                                }
+                                            }
+                                            while (productoNuevo == "");
+
+                                            productoNuevo = productoNuevo.Substring(0, 1).ToUpper() + productoNuevo.Substring(1).ToLower();
+
+                                            proveedores[nombr3].Producto = productoNuevo;
+                                            //-----------------------------------//
+                                            break;
+                                        case 3:
+                                            //-----------------------------------//
+                                            do
+                                            {
+                                                Console.Write("Ingrese el telefono: ");
+                                                telefono = Console.ReadLine().Trim();
+                                                if (telefono.Length != 8)
+                                                {
+                                                    Console.WriteLine("datos insuficients del numero telefonico");
+                                                }
+                                            } while (telefono.Length != 8);
+                                            clientes[nombr3].Telefono = telefono;
+
+                                            //-----------------------------------//
+
                                             break;
 
                                         default:
                                             break;
                                     }
 
-                                } while (opcion != 3);
-                            }
-                            else
-                            {
-                                Console.WriteLine("Proveedor no encontrado");
-                                Console.ReadKey();
-                            }
-                            break;
+                                } while (opc != 4);
 
-                        default:
-                            break;
-                    }
+                                ModificarCliente(nombr3, clientes[nombr3]);
+
+                                Console.ReadKey();
+
+
+                                ///-------------------------------------------////
+                                break;
+                            default:
+                                break;
+                        }
+                    } while (opcion != 6);
                     break;
 
 
@@ -1386,31 +1638,31 @@ class Programa
                         {
 
                             ////popular
-                            if (popular == null || item.Value.Vendidos > popular.Vendidos)
+                            if (popular == null || item.Value.VendidosProd > popular.VendidosProd)
                             {
                                 popular = item.Value;
                             }
                             /////reponer
-                            if(item.Value.Cantidad == 0)
+                            if(item.Value.CantidadProd == 0)
                             {
                                 reponer.Add(item.Value);
                             }
                             ////Vencimiento
-                            vence = (item.Value.Fecha - DateTime.Now).Days;
+                            vence = (item.Value.FechaProd - DateTime.Now).Days;
 
                             if(vence >= 0 && vence<=7)
                             {
                                 cambio.Add(item.Value);
                             }
 
-                            totalVentas += item.Value.Vendidos * item.Value.Precio;
+                            totalVentas += item.Value.VendidosProd * item.Value.PrecioProd;
                         }
 
                         if (popular != null)
                         {
                             Console.WriteLine("");
                             Console.WriteLine("----Producto mas vendido----");
-                            Console.WriteLine("| Articulo: " + popular.Nombre + " | Unidade vendidas:  "+ popular.Vendidos +" |");
+                            Console.WriteLine("| Articulo: " + popular.NombreProd + " | Unidade vendidas:  "+ popular.VendidosProd +" |");
                         }
 
                         if(reponer.Count > 0)
@@ -1419,7 +1671,7 @@ class Programa
                             Console.WriteLine("|---Productos a reponer---");
                             foreach(Productos item in reponer)
                             {
-                                Console.WriteLine("| Codigo: " + item.Codigo +"| Nombre: " + item.Nombre + "| Sin existecias |");
+                                Console.WriteLine("| Codigo: " + item.CodigoProd +" | Nombre: " + item.NombreProd + " | Sin existecias |");
                             }
 
                         }
@@ -1430,7 +1682,7 @@ class Programa
                             Console.WriteLine("----Productos ha vencer---");
                             foreach (Productos item in cambio)
                             {
-                                Console.WriteLine("| Codigo: " + item.Codigo + "| Nombre: " + item.Nombre + "| fecha: "+ item.Fecha.ToString("dd/MM/yyyy") + " |");
+                                Console.WriteLine("| Codigo: " + item.CodigoProd + " | Nombre: " + item.NombreProd + " | fecha: "+ item.FechaProd.ToString("dd/MM/yyyy") + " |");
                             }
 
                         }
